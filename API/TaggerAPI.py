@@ -5,14 +5,17 @@ from flask import g
 # Utilities
 import string
 
-# API files
-import Utils
+# Database Models
+import models
 
-# Database Connections
-import Database
+# Database
+from app import db
 
+def add( tag ):
+	u = models.Tag(value=tag['value'])
+	db.session.add(u)
+	db.session.commit()
+	return { 'success' : True }
 
 def search( terms ):
-	g.db = Database.openDB()
-	Database.closeDB(g)
 	return {'hi' : 'there'}
