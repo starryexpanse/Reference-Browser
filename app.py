@@ -1,8 +1,6 @@
 # Main Libraries
 import sys
-from flask import Flask, render_template, request, redirect, url_for, Response
-import json
-from bson import json_util
+from flask import Flask, render_template, request, redirect, url_for, Response, jsonify
 
 # API files
 import Settings
@@ -24,7 +22,7 @@ def index():
 
 @app.route('/addTag', methods=[ 'POST' ])
 def addTag():
-	return {}
+	return jsonify({'test':'asdf'}), 200
 
 
 @app.route('/search', methods=[ 'POST' ])
@@ -40,18 +38,10 @@ def search():
 
 	# If there is an error, return appropriate error code and response ...
 	if 'error' in response:                                                                                                                                   
-		error = json.dumps({ "error" : True, "message" : response['message'] })
-		resp = Response( error, status=400, mimetype='application/json' ) 
-		resp.headers['Link'] = request.url
-		return resp
+		return jsonify({ "error" : True, "message" : response['message'] }), 400
 
 	# ... otherwise return our search results.
-	js = json.dumps( response ) 
-	resp = Response( js, status=200, mimetype='application/json' )
-	resp.headers['Link'] = request.url
-
-	return resp
-
+	return jsonify( response ), 200
 
 
 if __name__ == '__main__':

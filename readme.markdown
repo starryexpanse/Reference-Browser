@@ -1,3 +1,3 @@
-Installation
-pip install flask
-pip install Flask-SQLAlchemy
+##Installation
+* <code>pip install flask</code>
+* <code>pip install Flask-SQLAlchemy</code>
