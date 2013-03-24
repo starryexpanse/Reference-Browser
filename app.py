@@ -1,22 +1,23 @@
-# Main Libraries
+# General
 import sys
-from flask import Flask, render_template, request, redirect, url_for, Response, jsonify
-from flask.ext.sqlalchemy import SQLAlchemy
 
+# Flask
+from flask import Flask, render_template, request, redirect, url_for, Response, jsonify
 
 # Flask Config Settings
 app = Flask(__name__)
 app.debug = True
 domain = "0.0.0.0"
 
-# Flask SQLAlchemy setting
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/refBrowser'
-db = SQLAlchemy(app)
-
 # API files
 import Settings
 sys.path.append( Settings.API_FOLDER )
 import TaggerAPI
+
+# Flask SQLAlchemy setting
+from models import db
+app.config['SQLALCHEMY_DATABASE_URI'] = Settings.DB_URI
+db.init_app(app)
 
 
 # Routes
@@ -51,8 +52,8 @@ def search():
 	response = TaggerAPI.search( request.json )
 
 	# If there is an error, return appropriate error code and response ...
-	if 'error' in response:                                                                                                                                   
-		return jsonify({ "message" : response['message'] }), 400
+	#if 'error' in response:                                                                                                                                   
+	#	return jsonify({ "message" : response['message'] }), 400
 
 	# ... otherwise return our search results.
 	return jsonify( response ), 200

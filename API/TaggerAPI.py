@@ -1,21 +1,17 @@
 # General
 import sys
-from flask import g
-
-# Utilities
-import string
 
 # Database Models
 import models
 
-# Database
-from app import db
-
-def add( tag ):
-	u = models.Tag(value=tag['value'])
+def add( request ):
+	u = models.Asset(type=request['type'], filename=request['filename'])
 	db.session.add(u)
 	db.session.commit()
 	return { 'success' : True }
 
-def search( terms ):
-	return {'hi' : 'there'}
+def search( request ):
+	results = models.Asset.query.filter_by(type=request['term']).first()
+	if results is None:
+		return {}
+	return results
