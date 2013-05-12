@@ -44,7 +44,7 @@ def addTag():
 def search():
 	
 	# Flask sets request.json to None if no request variables are passed. Parsing a 
-	# None type leads to an error, so let's set it to an empty object in the absense
+	# None type leads to an error, so let's set it to an empty object in the absence
 	# of request variables.
 	request.json = request.json or {}
 	
