@@ -12,10 +12,11 @@ domain = "0.0.0.0"
 # API files
 import Settings
 sys.path.append( Settings.API_FOLDER )
-import TaggerAPI
+
+from api import tags
 
 # Flask SQLAlchemy setting
-from models import db
+from api.models import db
 app.config['SQLALCHEMY_DATABASE_URI'] = Settings.DB_URI
 db.init_app(app)
 
@@ -29,7 +30,7 @@ def index():
 
 @app.route('/tag/add', methods=[ 'POST' ])
 def addTag():
-	response = TaggerAPI.add( request.json )
+	response = tags.add( request.json )
 
 	# If there is an error, return appropriate error code and response ...
 	if 'error' in response:                                                                                                                                   
@@ -49,7 +50,7 @@ def search():
 	request.json = request.json or {}
 	
 	# Search the database based off of data sent in the request
-	response = TaggerAPI.search( request.json )
+	response = tags.search( request.json )
 
 	# If there is an error, return appropriate error code and response ...
 	#if 'error' in response:                                                                                                                                   
