@@ -46,7 +46,7 @@ def search():
 	# Flask sets request.json to None if no request variables are passed. Parsing a 
 	# None type leads to an error, so let's set it to an empty object in the absense
 	# of request variables.
-	request.json = request.json if request.json else {}
+	request.json = request.json or {}
 	
 	# Search the database based off of data sent in the request
 	response = TaggerAPI.search( request.json )
