@@ -9,12 +9,14 @@ app = Flask(__name__)
 app.debug = True
 domain = "0.0.0.0"
 
-# API files
+# Settings
 import config
-from api import tags
+
+# API files
+from API import tags
 
 # Flask SQLAlchemy setting
-from api.models import db
+from API.models import db
 app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_URI
 db.init_app(app)
 
