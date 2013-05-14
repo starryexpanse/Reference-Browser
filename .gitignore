@@ -1,5 +1,10 @@
 *.pyc
+*/*.pyc
+*/*/*.pyc
+
 nohup.out
+*/nohup.out
+*/*/nohup.out
 
 # virtualenv
 bin/
