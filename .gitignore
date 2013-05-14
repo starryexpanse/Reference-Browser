@@ -11,3 +11,7 @@ bin/
 include/
 local/
 lib/
+
+# distutils
+dist/
+MANIFEST
