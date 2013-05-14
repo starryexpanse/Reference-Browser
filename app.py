@@ -13,10 +13,10 @@ domain = "0.0.0.0"
 import config
 
 # API files
-from API import tags
+from api import tags
 
 # Flask SQLAlchemy setting
-from API.models import db
+from api.models import db
 app.config['SQLALCHEMY_DATABASE_URI'] = config.DB_URI
 db.init_app(app)
 
