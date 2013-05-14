@@ -1,18 +1,8 @@
 *.pyc
-*/*.pyc
-*/*/*.pyc
-
 nohup.out
-*/nohup.out
-*/*/nohup.out
 
 # virtualenv
 bin/
 include/
 local/
 lib/
-
-# distutils
-dist/
-MANIFEST
-build/
