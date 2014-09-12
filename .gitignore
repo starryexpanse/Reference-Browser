@@ -6,3 +6,4 @@ bin/
 include/
 local/
 lib/
+venv/
