@@ -6,3 +6,9 @@ bin/
 include/
 local/
 lib/
+
+*~
+*.swp
+*.DS_Store
+__pycache__
+out.txt

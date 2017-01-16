@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="A file browser for the Starry Expanse project">
+    <meta name="author" content="Chris Mumford">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <title>Reference Browser: {{ title }}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body class="dark-body">
+
+    <div class="page-header">
+      <h1>Reference Browser<br><small>The Riven asset browser</small></h1>
+      <div>
+        <a class="btn btn-default" href="{{ url_for('islands') }}">All Islands</a>
+        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">Back to Island ({{island_symbol}})</a>
+        <a class="btn btn-warning pull-right" href="{{ url_for('logout') }}">Sign Off</a>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <h1>{{ title }}</h1>
+      <p>
+        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol, viewpoint=prev_vpt) }}">
+          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        </a>
+        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol, viewpoint=next_vpt) }}">
+          <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+        </a>
+      </p>
+
+      {% if movie_count > 0 %}
+      <h2>Movies ({{ movie_count }})</h2>
+      <ol>
+        {% for movie in movies %}
+          <li>
+            <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
+            <video class="img img-responsive"
+              src="{{ url_for('protected', filename=movie.h264_path) }}"
+              loop controls><p>don't support video</p></vid>
+          </li>
+        {% endfor %}
+      </ol>
+      {% endif %}
+
+      {% if image_count > 0 %}
+      <h2>Images ({{image_count}})</h2>
+      <ol>
+      {% for image in images %}
+          <li>{{ image.friendly }}</br>
+            <img class="img-responsive" src="{{ url_for('protected', filename=image.file_path) }}">
+          </li>
+      {% endfor %}
+      </ol>
+      {% endif %}
+      </div>
+
+    </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
+  </body>
+</html>
