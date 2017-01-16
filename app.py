@@ -210,15 +210,15 @@ def island(symbol):
   else:
     vpt_query=Viewpoint.query.filter(
         Viewpoint.island == island.id).order_by(Viewpoint.name)
-    loc_query=Position.query.filter(
+    pos_query=Position.query.filter(
         Position.island == island.id).order_by(Position.id)
     return render_template('island.html',
         viewpoints=vpt_query,
-        positions=loc_query,
+        positions=pos_query,
         island_name=island.title(),
         island_symbol=island.symbol,
         use_unveil=True,
-        position_count=loc_query.count(),
+        position_count=pos_query.count(),
         viewpoint_count=vpt_query.count())
 
 @app.route('/viewpoints')
