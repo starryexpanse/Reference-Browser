@@ -2,10 +2,13 @@
 .PHONY: default
 default: makedb
 
-.PHONY: cleanthumbs
-cleanthumbs:
-	find . -name '*thumbnail*.png' | xargs rm
+.PHONY: cleanpositionthumbs
+cleanpositionthumbs:
 	find . -name '*thumbnail*.gif' | xargs rm
+
+.PHONY: cleanthumbs
+cleanthumbs: cleanpositionthumbs
+	find . -name '*thumbnail*.png' | xargs rm
 	rm -rf protected/images
 
 .PHONY: cleangifs

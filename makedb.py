@@ -319,6 +319,7 @@ class Loader(object):
 
   @staticmethod
   def ScaleImage(infile, outfile, scale_factor):
+    print('%s -> %s' % (infile, outfile))
     with Image.open(infile) as im:
       width, height = im.size
       thumb = im.resize((int(width*scale_factor), int(height*scale_factor)),
