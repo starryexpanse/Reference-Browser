@@ -235,7 +235,6 @@ def images():
 @login_required
 def protected(filename):
   fullpath=os.path.join(app.instance_path, 'protected', filename)
-  print 'Wanted "%s"' % fullpath
   return send_from_directory(
     os.path.join(app.root_path, 'protected'),
     filename
