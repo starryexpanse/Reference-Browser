@@ -10,14 +10,15 @@ extract the game assets.
 
 For hosting the reference browser:
 
+    pip install Pillow
     pip install flask
     pip install flask-sqlalchemy
     pip install flask-login
     pip install flask-wtf
 
-**Note**: The program to make the database (makedb.py) is Python3, but the
-web application is Python2 - you will need to install the first two Python
-modules for both Pythons (i.e. pip and pip3).
+**Note**: The program to make the database (makedb.py) is written in Python3, but the
+web application is written in Python2 - you will need to install the first two Python
+packages into both Pythons (i.e. pip and pip3).
 
 For creating the database:
 
@@ -28,11 +29,12 @@ For creating the database:
 # Creating the database.
 
 1. Put the extracted game data in the protected/DVD folder.
-2. Run `make`. If you don't have make installed then `./makedb.py`.
+2. Run `make`. If you don't have make installed then `./makedb.py`
+   or `python3 makedb.py`.
 
 This takes a while (> 10 minutes on most systems), mostly because
 the movie transcoding process is CPU intensive. When finished the
-database ("riven.sqlite") will exist, as well as many new images
+database ("riven.sqlite") will exist as well as many new images
 in the protected folder. To delete these newly created images just:
 
     make cleanall
