@@ -176,6 +176,8 @@ class RivenMovie(object):
 
 class Loader(object):
   protected_dir = 'protected'
+  thumbnail_sf = 0.18
+  thumbnail2x_sf = 0.36
 
   def __init__(self, top_dir):
     self.top_dir = top_dir
@@ -387,14 +389,14 @@ class Loader(object):
     outfile = os.path.join(os.path.dirname(thumbnail_src), fname)
     if not os.path.exists(outfile):
       futures.append(executor.submit(Loader.ScaleImage,
-                                     thumbnail_src, outfile, 0.18))
+                                     thumbnail_src, outfile, Loader.thumbnail_sf))
     viewpoint.thumbnail = Loader.UnprotectPath(outfile)
     # Retina resolution
     fname = '%s_thumbnail2x.png' % viewpoint.name
     outfile = os.path.join(os.path.dirname(thumbnail_src), fname)
     if not os.path.exists(outfile):
       futures.append(executor.submit(Loader.ScaleImage,
-                                     thumbnail_src, outfile, 0.36))
+                                     thumbnail_src, outfile, Loader.thumbnail2x_sf))
     viewpoint.thumbnail2x = Loader.UnprotectPath(outfile)
 
     return futures
@@ -407,13 +409,13 @@ class Loader(object):
     fname = '%s_thumbnail.png' % viewpoint.name
     outfile = os.path.join(os.path.dirname(thumbnail_src), fname)
     futures.append(executor.submit(Loader.CreateMovieThumbnail,
-                                   thumbnail_src, outfile, 0.18))
+                                   thumbnail_src, outfile, Loader.thumbnail_sf))
     viewpoint.thumbnail = Loader.UnprotectPath(outfile)
     # Retina resolution
     fname = '%s_thumbnail2x.png' % viewpoint.name
     outfile = os.path.join(os.path.dirname(thumbnail_src), fname)
     futures.append(executor.submit(Loader.CreateMovieThumbnail,
-                                   thumbnail_src, outfile, 0.36))
+                                   thumbnail_src, outfile, Loader.thumbnail2x_sf))
     viewpoint.thumbnail2x = Loader.UnprotectPath(outfile)
 
     return futures
