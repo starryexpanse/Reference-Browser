@@ -2,6 +2,7 @@
 
 from file_finder import FileFinder, FileInfo
 from concurrent.futures import ThreadPoolExecutor
+from graphviz import Digraph
 from PIL import Image
 import json
 import multiprocessing
@@ -50,6 +51,15 @@ class Globals(object):
 class Map(object):
   def __init__(self):
     self.islands = dict()
+
+  def WriteGraphViz(self, fname):
+    with open(fname, 'w') as f:
+      dot = Digraph(comment='Riven')
+      dot.engine = 'fdp'
+      for island_symbol in self.islands:
+        self.islands[island_symbol].AddGraphVizData(dot)
+      f.write(dot.source)
+      dot.render(fname)
 
 class Island(object):
   # name, AKA, Suffix, icon
@@ -107,6 +117,14 @@ class Island(object):
               symbol TEXT, name TEXT, aka TEXT, suffix TEXT, icon TEXT)''')
     conn.commit()
 
+  @property
+  def graphviz_name(self):
+    return 'I%d' % self.id
+
+  def AddGraphVizData(self, dot):
+    for position_name in self.positions:
+      self.positions[position_name].AddGraphVizData(dot)
+
 class Position(object):
   next_id = 1
 
@@ -136,6 +154,20 @@ class Position(object):
               FOREIGN KEY(island) REFERENCES islands(island_id))''')
     conn.commit()
 
+  @property
+  def graphviz_name(self):
+    return 'P%d' % self.id
+
+  @property
+  def graphviz_title(self):
+    return 'P%s' % self.name
+
+  def AddGraphVizData(self, dot):
+    dot.node(self.graphviz_name, self.graphviz_title)
+    for viewpoint_name in self.viewpoints:
+      self.viewpoints[viewpoint_name].AddGraphVizData(dot)
+    dot.edge(self.island.graphviz_name, self.graphviz_name)
+
 class Viewpoint(object):
   next_id = 1
 
@@ -145,17 +177,21 @@ class Viewpoint(object):
     self.name = name
     self.island = island
     self.position = None
+    self.left_viewpoint = None
+    self.right_viewpoint = None
     self.thumbnail = None
     self.thumbnail2x = None
 
   def sqlrow(self):
     pos_id = self.position.id if self.position else None
+    left_vpt_id = self.left_viewpoint.id if self.left_viewpoint else None
+    right_vpt_id = self.right_viewpoint.id if self.right_viewpoint else None
     return [self.id, self.island.id, pos_id, self.name,
-            self.thumbnail, self.thumbnail2x]
+            self.thumbnail, self.thumbnail2x, left_vpt_id, right_vpt_id]
 
   @staticmethod
   def insert():
-    return '(?,?,?,?,?,?)'
+    return '(?,?,?,?,?,?,?,?)'
 
   @staticmethod
   def CreateTable(conn):
@@ -167,10 +203,30 @@ class Viewpoint(object):
               name INTEGER,
               thumbnail TEXT,
               thumbnail2x TEXT,
+              left_viewpoint INTEGER,
+              right_viewpoint INTEGER,
               FOREIGN KEY(island) REFERENCES islands(island_id),
+              FOREIGN KEY(left_viewpoint) REFERENCES viewpoints(viewpoint_id),
+              FOREIGN KEY(right_viewpoint) REFERENCES viewpoints(viewpoint_id),
               FOREIGN KEY(position) REFERENCES positions(position_id))''')
 
     conn.commit()
+
+  @property
+  def graphviz_name(self):
+    return 'V%d' % self.id
+
+  @property
+  def graphviz_title(self):
+    return 'V%s' % self.name
+
+  def AddGraphVizData(self, dot):
+    dot.node(self.graphviz_name, self.graphviz_title)
+    dot.edge(self.position.graphviz_name, self.graphviz_name)
+    if self.left_viewpoint:
+      dot.edge(self.graphviz_name, self.left_viewpoint.graphviz_name)
+    if self.right_viewpoint:
+      dot.edge(self.graphviz_name, self.right_viewpoint.graphviz_name)
 
 class RivenImg(object):
   next_id = 1
@@ -302,9 +358,20 @@ class Loader(object):
     conn.commit()
 
   @staticmethod
+  def ParseIslandViewpoint(current_island, viewpoint_name):
+    items = viewpoint_name.split('/')
+    if len(items) == 2:
+      return (items[0], items[1])
+    else:
+      return (current_island, viewpoint_name)
+
+  @staticmethod
   def LoadMap(fname):
     """Load the Riven node map from the given file."""
     riven_map = Map()
+    pos_count = 0
+    vpt_count = 0
+    viewpoint_references = [] # (Viewpoint, island_symbol, pos, viewpoint_name)
     with open(os.path.join(fname)) as data_file:
       json_islands = json.load(data_file)
       for json_island in json_islands:
@@ -312,11 +379,27 @@ class Loader(object):
         island = Island(island_symbol)
         riven_map.islands[island_symbol] = island
         for json_position in json_island['positions']:
+          pos_count += 1
           position = Position(json_position['name'], island)
           for json_viewpoint in json_position['viewpoints']:
             viewpoint = island.GetViewpoint(json_viewpoint['name'])
+            viewpoint.position = position
+            vpt_count += 1
             position.viewpoints[viewpoint.name] = viewpoint
+            for pos_name in ['left', 'right']:
+              if pos_name in json_viewpoint:
+                (isle_sym, vpt_name) = \
+                   Loader.ParseIslandViewpoint(island_symbol,
+                                               json_viewpoint[pos_name])
+                viewpoint_references.append((viewpoint, isle_sym, pos_name,
+                                             vpt_name))
           island.positions[position.name] = position
+      # Now connect the viewpoints.
+      for vpt, island_symbol, pos, vpt_name in viewpoint_references:
+        island = riven_map.islands[island_symbol]
+        if pos == 'left':
+          vpt.left_viewpoint = island.viewpoints[vpt_name]
+      print('# Positions:%d, # Viewpoints:%d' % (pos_count, vpt_count))
     return riven_map
 
   @staticmethod
@@ -547,6 +630,7 @@ class Loader(object):
     c = conn.cursor()
 
     riven = Loader.LoadMap('map.json')
+    riven.WriteGraphViz('riven.dot')
 
     executor = ThreadPoolExecutor(max_workers=num_cpus)
     futures = []

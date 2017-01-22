@@ -10,11 +10,12 @@ extract the game assets.
 
 For hosting the reference browser:
 
-    pip install Pillow
     pip install flask
     pip install flask-sqlalchemy
     pip install flask-login
     pip install flask-wtf
+    pip3 install Pillow
+    pip3 install graphviz
 
 **Note**: The program to make the database (makedb.py) is written in Python3, but the
 web application is written in Python2 - you will need to install the first two Python
@@ -25,6 +26,7 @@ For creating the database:
 1. Install sqlite3.
 1. Install ffmpeg.
 1. Install ImageMagick.
+1. Install graphviz.
 
 # Creating the database.
 

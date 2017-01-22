@@ -87,6 +87,12 @@ class Viewpoint(db.Model):
   name = db.Column(db.String(100))
   thumbnail = db.Column(db.String(256))
   thumbnail2x = db.Column(db.String(256))
+  left_viewpoint = db.Column('left_viewpoint',
+                             db.ForeignKey('viewpoints.viewpoint_id'),
+                             nullable=True)
+  right_viewpoint = db.Column('right_viewpoint',
+                              db.ForeignKey('viewpoints.viewpoint_id'),
+                              nullable=True)
 
 class RivenImage(db.Model):
   __tablename__ = 'rivenimgs'
