@@ -46,6 +46,10 @@ class Globals(object):
               thumbnail2x_height INTEGER)''')
     conn.commit()
 
+class Map(object):
+  def __init__(self):
+    self.islands = dict()
+
 class Island(object):
   # name, AKA, Suffix, icon
   info = {
@@ -120,8 +124,8 @@ class Viewpoint(object):
     self.thumbnail2x = None
 
   def sqlrow(self):
-    return [self.id, self.island_id, self.position_id, self.name, self.thumbnail,
-            self.thumbnail2x]
+    return [self.id, self.island_id, self.position_id, self.name,
+            self.thumbnail, self.thumbnail2x]
 
   @staticmethod
   def insert():
@@ -256,10 +260,10 @@ class Loader(object):
     conn.commit()
 
   @staticmethod
-  def LoadPositions(fname):
+  def LoadMap(fname):
     """Load the Riven node map from the given file."""
     pos_id = 1
-    positions = dict()
+    riven = Map()
     with open(os.path.join(fname)) as data_file:
       json_islands = json.load(data_file)
       for json_island in json_islands:
@@ -271,8 +275,8 @@ class Loader(object):
           for json_viewpoint in json_position['viewpoints']:
             position.viewpoint_names.append(json_viewpoint['id'])
           pos_array.append(position)
-        positions[island_symbol] = pos_array
-    return positions
+        riven.islands[island_symbol] = pos_array
+    return riven
 
   @staticmethod
   def SwapExtension(fname, newextn):
@@ -505,7 +509,7 @@ class Loader(object):
       islands.append(Island(island_symbol).sqlrow())
     c.executemany('INSERT INTO islands VALUES %s' % Island.insert(), islands)
 
-    island_to_posns = Loader.LoadPositions('map.json')
+    riven = Loader.LoadMap('map.json')
 
     viewpoints = []
     vpt_id = 1
@@ -515,8 +519,8 @@ class Loader(object):
     island_vpt_to_vpt_id = dict()
     for island_symbol in island_to_imgvpt.keys():
       island_posns = None
-      if island_symbol in island_to_posns:
-        island_posns = island_to_posns[island_symbol]
+      if island_symbol in riven.islands:
+        island_posns = riven.islands[island_symbol]
       for vpt in island_to_imgvpt[island_symbol]:
         pos_id = Loader.FindPositionID(island_posns, vpt)
         viewpoints.append(Viewpoint(vpt_id, ord(island_symbol), pos_id, vpt))
@@ -534,8 +538,8 @@ class Loader(object):
     all_positions = []
     for island_symbol in island_to_movvpt.keys():
       island_posns = None
-      if island_symbol in island_to_posns:
-        island_posns = island_to_posns[island_symbol]
+      if island_symbol in riven.islands:
+        island_posns = riven.islands[island_symbol]
         all_positions.extend(island_posns)
       for vpt in island_to_movvpt[island_symbol]:
         pos_id = Loader.FindPositionID(island_posns, vpt)
