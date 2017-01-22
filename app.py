@@ -93,6 +93,18 @@ class Viewpoint(db.Model):
   right_viewpoint = db.Column('right_viewpoint',
                               db.ForeignKey('viewpoints.viewpoint_id'),
                               nullable=True)
+  up_viewpoint = db.Column('up_viewpoint',
+                            db.ForeignKey('viewpoints.viewpoint_id'),
+                            nullable=True)
+  down_viewpoint = db.Column('down_viewpoint',
+                             db.ForeignKey('viewpoints.viewpoint_id'),
+                             nullable=True)
+  forward_viewpoint = db.Column('forward_viewpoint',
+                                db.ForeignKey('viewpoints.viewpoint_id'),
+                                nullable=True)
+  backward_viewpoint = db.Column('backward_viewpoint',
+                                 db.ForeignKey('viewpoints.viewpoint_id'),
+                                 nullable=True)
 
 class RivenImage(db.Model):
   __tablename__ = 'rivenimgs'

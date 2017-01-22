@@ -54,7 +54,7 @@ class Map(object):
 
   def WriteGraphViz(self, fname):
     with open(fname, 'w') as f:
-      dot = Digraph(comment='Riven')
+      dot = Digraph(comment='Riven', node_attr={'margin': '0.0'})
       dot.engine = 'fdp'
       for island_symbol in self.islands:
         self.islands[island_symbol].AddGraphVizData(dot)
@@ -121,7 +121,12 @@ class Island(object):
   def graphviz_name(self):
     return 'I%d' % self.id
 
+  @property
+  def graphviz_title(self):
+    return self.name
+
   def AddGraphVizData(self, dot):
+    dot.node(self.graphviz_name, self.graphviz_title)
     for position_name in self.positions:
       self.positions[position_name].AddGraphVizData(dot)
 
@@ -179,6 +184,10 @@ class Viewpoint(object):
     self.position = None
     self.left_viewpoint = None
     self.right_viewpoint = None
+    self.up_viewpoint = None
+    self.down_viewpoint = None
+    self.forward_viewpoint = None
+    self.backward_viewpoint = None
     self.thumbnail = None
     self.thumbnail2x = None
 
@@ -186,12 +195,17 @@ class Viewpoint(object):
     pos_id = self.position.id if self.position else None
     left_vpt_id = self.left_viewpoint.id if self.left_viewpoint else None
     right_vpt_id = self.right_viewpoint.id if self.right_viewpoint else None
+    up_vpt_id = self.up_viewpoint.id if self.up_viewpoint else None
+    down_vpt_id = self.down_viewpoint.id if self.down_viewpoint else None
+    forward_vpt_id = self.forward_viewpoint.id if self.forward_viewpoint else None
+    backward_vpt_id = self.backward_viewpoint.id if self.backward_viewpoint else None
     return [self.id, self.island.id, pos_id, self.name,
-            self.thumbnail, self.thumbnail2x, left_vpt_id, right_vpt_id]
+            self.thumbnail, self.thumbnail2x, left_vpt_id, right_vpt_id,
+            up_vpt_id, down_vpt_id, forward_vpt_id, backward_vpt_id]
 
   @staticmethod
   def insert():
-    return '(?,?,?,?,?,?,?,?)'
+    return '(?,?,?,?,?,?,?,?,?,?,?,?)'
 
   @staticmethod
   def CreateTable(conn):
@@ -205,9 +219,17 @@ class Viewpoint(object):
               thumbnail2x TEXT,
               left_viewpoint INTEGER,
               right_viewpoint INTEGER,
+              up_viewpoint INTEGER,
+              down_viewpoint INTEGER,
+              forward_viewpoint INTEGER,
+              backward_viewpoint INTEGER,
               FOREIGN KEY(island) REFERENCES islands(island_id),
               FOREIGN KEY(left_viewpoint) REFERENCES viewpoints(viewpoint_id),
               FOREIGN KEY(right_viewpoint) REFERENCES viewpoints(viewpoint_id),
+              FOREIGN KEY(up_viewpoint) REFERENCES viewpoints(viewpoint_id),
+              FOREIGN KEY(down_viewpoint) REFERENCES viewpoints(viewpoint_id),
+              FOREIGN KEY(forward_viewpoint) REFERENCES viewpoints(viewpoint_id),
+              FOREIGN KEY(backward_viewpoint) REFERENCES viewpoints(viewpoint_id),
               FOREIGN KEY(position) REFERENCES positions(position_id))''')
 
     conn.commit()
@@ -224,9 +246,17 @@ class Viewpoint(object):
     dot.node(self.graphviz_name, self.graphviz_title)
     dot.edge(self.position.graphviz_name, self.graphviz_name)
     if self.left_viewpoint:
-      dot.edge(self.graphviz_name, self.left_viewpoint.graphviz_name)
+      dot.edge(self.graphviz_name, self.left_viewpoint.graphviz_name, 'L')
     if self.right_viewpoint:
-      dot.edge(self.graphviz_name, self.right_viewpoint.graphviz_name)
+      dot.edge(self.graphviz_name, self.right_viewpoint.graphviz_name, 'R')
+    if self.up_viewpoint:
+      dot.edge(self.graphviz_name, self.up_viewpoint.graphviz_name, 'U')
+    if self.down_viewpoint:
+      dot.edge(self.graphviz_name, self.down_viewpoint.graphviz_name, 'D')
+    if self.forward_viewpoint:
+      dot.edge(self.graphviz_name, self.forward_viewpoint.graphviz_name, 'F')
+    if self.backward_viewpoint:
+      dot.edge(self.graphviz_name, self.backward_viewpoint.graphviz_name, 'B')
 
 class RivenImg(object):
   next_id = 1
@@ -386,7 +416,7 @@ class Loader(object):
             viewpoint.position = position
             vpt_count += 1
             position.viewpoints[viewpoint.name] = viewpoint
-            for pos_name in ['left', 'right']:
+            for pos_name in ['left', 'right', 'up', 'down', 'forward', 'backward']:
               if pos_name in json_viewpoint:
                 (isle_sym, vpt_name) = \
                    Loader.ParseIslandViewpoint(island_symbol,
@@ -399,6 +429,16 @@ class Loader(object):
         island = riven_map.islands[island_symbol]
         if pos == 'left':
           vpt.left_viewpoint = island.viewpoints[vpt_name]
+        elif pos == 'right':
+          vpt.right_viewpoint = island.viewpoints[vpt_name]
+        elif pos == 'up':
+          vpt.up_viewpoint = island.viewpoints[vpt_name]
+        elif pos == 'down':
+          vpt.down_viewpoint = island.viewpoints[vpt_name]
+        elif pos == 'forward':
+          vpt.forward_viewpoint = island.viewpoints[vpt_name]
+        elif pos == 'backward':
+          vpt.backward_viewpoint = island.viewpoints[vpt_name]
       print('# Positions:%d, # Viewpoints:%d' % (pos_count, vpt_count))
     return riven_map
 
