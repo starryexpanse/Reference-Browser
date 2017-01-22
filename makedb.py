@@ -175,21 +175,24 @@ class Viewpoint(object):
 class RivenImg(object):
   next_id = 1
 
-  def __init__(self, viewpoint, filename, friendly, file_path):
+  def __init__(self, viewpoint, filename, friendly, file_path, image_width,
+               image_height):
     self.id = RivenImg.next_id
     RivenImg.next_id += 1
     self.viewpoint = viewpoint
     self.filename = filename
     self.friendly = friendly
     self.file_path = file_path
+    self.image_width = image_width
+    self.image_height = image_height
 
   def sqlrow(self):
     return [self.id, self.viewpoint.id, self.filename, self.friendly,
-            self.file_path]
+            self.file_path, self.image_width, self.image_height]
 
   @staticmethod
   def insert():
-    return '(?,?,?,?,?)'
+    return '(?,?,?,?,?,?,?)'
 
   @staticmethod
   def CreateTable(conn):
@@ -200,6 +203,8 @@ class RivenImg(object):
               filename TEXT,
               friendly TEXT,
               file_path TEXT,
+              image_width INTEGER,
+              image_height INTEGER,
               FOREIGN KEY(viewpoint) REFERENCES viewpoints(viewpoint_id))''')
     conn.commit()
 
@@ -207,7 +212,7 @@ class RivenMovie(object):
   next_id = 1
 
   def __init__(self, viewpoint, filename, friendly, file_path, gif_path,
-               h264_path):
+               h264_path, movie_width, movie_height):
     self.id = RivenMovie.next_id
     RivenMovie.next_id += 1
     self.viewpoint = viewpoint
@@ -216,14 +221,17 @@ class RivenMovie(object):
     self.file_path = file_path
     self.anim_gif_path = gif_path
     self.h264_path = h264_path
+    self.movie_width = movie_width
+    self.movie_height = movie_height
 
   def sqlrow(self):
     return [self.id, self.viewpoint.id, self.filename, self.friendly,
-            self.file_path, self.anim_gif_path, self.h264_path]
+            self.file_path, self.anim_gif_path, self.h264_path,
+            self.movie_width, self.movie_height]
 
   @staticmethod
   def insert():
-    return '(?,?,?,?,?,?,?)'
+    return '(?,?,?,?,?,?,?,?,?)'
 
   @staticmethod
   def CreateTable(conn):
@@ -236,6 +244,8 @@ class RivenMovie(object):
               file_path TEXT,
               anim_gif_path TEXT,
               h264_path TEXT,
+              movie_width INTEGER,
+              movie_height INTEGER,
               FOREIGN KEY(viewpoint) REFERENCES viewpoints(viewpoint_id))''')
     conn.commit()
 
@@ -485,6 +495,15 @@ class Loader(object):
     return futures
 
   @staticmethod
+  def SetImageSize(info, image):
+    with Image.open(info.file_path) as im:
+      image.image_width, image.image_height = im.size
+
+  @staticmethod
+  def SetMovieSize(info, movie):
+    movie.movie_width, movie.movie_height = Loader.GetMovieSize(info.file_path)
+
+  @staticmethod
   def CreateViewpointThumbnails(viewpoints, images, movies):
     view2img = dict()
     for image in images:
@@ -529,6 +548,9 @@ class Loader(object):
 
     riven = Loader.LoadMap('map.json')
 
+    executor = ThreadPoolExecutor(max_workers=num_cpus)
+    futures = []
+
     images = []
     for island_symbol in island_to_imgvpt:
       if island_symbol in riven.islands:
@@ -542,10 +564,11 @@ class Loader(object):
         viewpoint_to_info = island_to_imgvpt[island_symbol]
         for info in viewpoint_to_info[viewpoint_name]:
           file_path = Loader.UnprotectPath(info.file_path)
-          images.append(RivenImg(viewpoint, info.filename(),
-                        info.friendly_name(), file_path))
-    executor = ThreadPoolExecutor(max_workers=num_cpus)
-    futures = []
+          image = RivenImg(viewpoint, info.filename(), info.friendly_name(),
+                           file_path, 0, 0)
+          images.append(image)
+          futures.append(executor.submit(Loader.SetImageSize, info, image))
+
     movies = []
     for island_symbol in island_to_movvpt:
       if island_symbol in riven.islands:
@@ -567,9 +590,11 @@ class Loader(object):
           viewpoint = island.GetViewpoint(viewpoint_name)
           gif_path = Loader.UnprotectPath(gif_path);
           h264_path = Loader.UnprotectPath(h264_path);
-          movies.append(RivenMovie(viewpoint, info.filename(),
-                         info.friendly_name(),
-                         info.file_path, gif_path, h264_path))
+          movie = RivenMovie(viewpoint, info.filename(), info.friendly_name(),
+                             info.file_path, gif_path, h264_path, 0, 0)
+          movies.append(movie)
+          futures.append(executor.submit(Loader.SetMovieSize, info, movie))
+
     all_islands = []
     all_viewpoints = []
     all_positions = []

@@ -57,8 +57,9 @@
           <li>
             <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
             <video class="img img-responsive"
-              src="{{ url_for('protected', filename=movie.h264_path) }}"
-              loop controls><p>don't support video</p></vid>
+                   width="{{movie.movie_width}}" height="{{movie.movie_height}}"
+                   src="{{ url_for('protected', filename=movie.h264_path) }}"
+                   loop controls><p>don't support video</p></vid>
           </li>
         {% endfor %}
       </ol>
@@ -69,7 +70,9 @@
       <ol>
       {% for image in images %}
           <li>{{ image.friendly }}</br>
-            <img class="img-responsive" src="{{ url_for('protected', filename=image.file_path) }}">
+            <img class="img-responsive"
+                 width="{{image.image_width}}" height="{{image.image_height}}"
+                 src="{{ url_for('protected', filename=image.file_path) }}">
           </li>
       {% endfor %}
       </ol>

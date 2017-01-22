@@ -96,6 +96,8 @@ class RivenImage(db.Model):
   filename = db.Column(db.String(100))
   friendly = db.Column(db.String(100))
   file_path = db.Column(db.String(256))
+  image_width = db.Column(db.Integer)
+  image_height = db.Column(db.Integer)
 
 class RivenMovie(db.Model):
   __tablename__ = 'rivenmovs'
@@ -107,6 +109,8 @@ class RivenMovie(db.Model):
   file_path = db.Column(db.String(256))
   anim_gif_path = db.Column(db.String(256))
   h264_path = db.Column(db.String(256))
+  movie_width = db.Column(db.Integer)
+  movie_height = db.Column(db.Integer)
 
 @login_manager.user_loader
 def load_user(user_id):
