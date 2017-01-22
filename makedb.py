@@ -257,26 +257,21 @@ class Loader(object):
 
   @staticmethod
   def LoadPositions(fname):
+    """Load the Riven node map from the given file."""
     pos_id = 1
     positions = dict()
-    island_symbol = None
-    with open('positions.txt') as f:
-      for line in f.readlines():
-        if not line or line[0] == '#':
-          continue
-        line = line.strip()
-        if not len(line) > 1:
-          continue
-        if line[1] == ':':
-          island_symbol = line[0]
-        else:
-          assert(island_symbol)
+    with open(os.path.join(fname)) as data_file:
+      json_islands = json.load(data_file)
+      for json_island in json_islands:
+        island_symbol = json_island['symbol']
+        pos_array = []
+        for json_position in json_island['positions']:
           position = Position(ord(island_symbol), pos_id)
           pos_id += 1
-          position.viewpoint_names = [vpt for vpt in line.split()]
-          if island_symbol not in positions:
-            positions[island_symbol] = []
-          positions[island_symbol].append(position)
+          for json_viewpoint in json_position['viewpoints']:
+            position.viewpoint_names.append(json_viewpoint['id'])
+          pos_array.append(position)
+        positions[island_symbol] = pos_array
     return positions
 
   @staticmethod
@@ -510,7 +505,7 @@ class Loader(object):
       islands.append(Island(island_symbol).sqlrow())
     c.executemany('INSERT INTO islands VALUES %s' % Island.insert(), islands)
 
-    island_to_posns = Loader.LoadPositions('positions.txt')
+    island_to_posns = Loader.LoadPositions('map.json')
 
     viewpoints = []
     vpt_id = 1
