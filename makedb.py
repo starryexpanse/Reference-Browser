@@ -314,7 +314,7 @@ class Loader(object):
         for json_position in json_island['positions']:
           position = Position(json_position['name'], island)
           for json_viewpoint in json_position['viewpoints']:
-            viewpoint = island.GetViewpoint(json_viewpoint['id'])
+            viewpoint = island.GetViewpoint(json_viewpoint['name'])
             position.viewpoints[viewpoint.name] = viewpoint
           island.positions[position.name] = position
     return riven_map
