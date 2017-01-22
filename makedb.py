@@ -21,7 +21,8 @@ class InvalidPathException(Exception):
 class Globals(object):
   def __init__(self):
     self.global_id = 1
-    self.thumbnail_size = [int(v * Loader.thumbnail_sf) for v in StandardImageSize]
+    self.thumbnail_size = [int(v * Loader.thumbnail_sf) for v in
+                           StandardImageSize]
     self.thumbnail2x_size = [int(v * Loader.thumbnail2x_sf) for v in
                              StandardImageSize]
 
@@ -74,6 +75,22 @@ class Island(object):
       self.icon = 'images/' + Island.info[symbol][3]
     else:
       self.icon = ''
+    self.positions = dict()  # Position.name -> Position
+    self.viewpoints = dict() # Viewpoint.name -> Viewpoint
+
+  def GetViewpoint(self, viewpoint_name):
+    """Get (or create) a Viewpoint"""
+    if viewpoint_name in self.viewpoints:
+      return self.viewpoints[viewpoint_name]
+    viewpoint = Viewpoint(viewpoint_name, self)
+    self.viewpoints[viewpoint.name] = viewpoint
+    return viewpoint
+
+  def FindPosition(self, viewpoint_name):
+    if viewpoint_name in self.viewpoints:
+      return self.viewpoints[viewpoint_name]
+    else:
+      return None
 
   def sqlrow(self):
     return [self.id, self.symbol, self.name, self.aka, self.suffix, self.icon]
@@ -91,40 +108,49 @@ class Island(object):
     conn.commit()
 
 class Position(object):
-  def __init__(self, island_id, pos_id):
-    self.pos_id = pos_id
+  next_id = 1
+
+  def __init__(self, name, island):
+    self.id = Position.next_id
+    Position.next_id += 1
+    self.name = name
     self.thumbnail = None
-    self.island_id = island_id
-    self.viewpoint_names = []
+    self.island = island
+    self.viewpoints = dict() # Viewpoint.name => viewpoint
 
   def sqlrow(self):
-    return [self.pos_id, self.island_id, self.thumbnail]
+    return [self.id, self.name, self.island.id, self.thumbnail]
 
   @staticmethod
   def insert():
-    return '(?,?,?)'
+    return '(?,?,?,?)'
 
   @staticmethod
   def CreateTable(conn):
     c = conn.cursor()
     c.execute('''CREATE TABLE positions
               (position_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
               island INTEGER,
               thumbnail TEXT,
               FOREIGN KEY(island) REFERENCES islands(island_id))''')
     conn.commit()
 
 class Viewpoint(object):
-  def __init__(self, id, island_id, position_id, name):
-    self.id = id
-    self.island_id = island_id
-    self.position_id = position_id
+  next_id = 1
+
+  def __init__(self, name, island):
+    self.id = Viewpoint.next_id
+    Viewpoint.next_id += 1
     self.name = name
+    self.island = island
+    self.position = None
     self.thumbnail = None
     self.thumbnail2x = None
 
   def sqlrow(self):
-    return [self.id, self.island_id, self.position_id, self.name,
+    pos_id = self.position.id if self.position else None
+    return [self.id, self.island.id, pos_id, self.name,
             self.thumbnail, self.thumbnail2x]
 
   @staticmethod
@@ -147,15 +173,18 @@ class Viewpoint(object):
     conn.commit()
 
 class RivenImg(object):
-  def __init__(self, id, viewpoint_id, filename, friendly, file_path):
-    self.id = id
-    self.viewpoint_id = viewpoint_id
+  next_id = 1
+
+  def __init__(self, viewpoint, filename, friendly, file_path):
+    self.id = RivenImg.next_id
+    RivenImg.next_id += 1
+    self.viewpoint = viewpoint
     self.filename = filename
     self.friendly = friendly
     self.file_path = file_path
 
   def sqlrow(self):
-    return [self.id, self.viewpoint_id, self.filename, self.friendly,
+    return [self.id, self.viewpoint.id, self.filename, self.friendly,
             self.file_path]
 
   @staticmethod
@@ -175,10 +204,13 @@ class RivenImg(object):
     conn.commit()
 
 class RivenMovie(object):
-  def __init__(self, id, viewpoint_id, filename, friendly, file_path, gif_path,
+  next_id = 1
+
+  def __init__(self, viewpoint, filename, friendly, file_path, gif_path,
                h264_path):
-    self.id = id
-    self.viewpoint_id = viewpoint_id
+    self.id = RivenMovie.next_id
+    RivenMovie.next_id += 1
+    self.viewpoint = viewpoint
     self.filename = filename
     self.friendly = friendly
     self.file_path = file_path
@@ -186,7 +218,7 @@ class RivenMovie(object):
     self.h264_path = h264_path
 
   def sqlrow(self):
-    return [self.id, self.viewpoint_id, self.filename, self.friendly,
+    return [self.id, self.viewpoint.id, self.filename, self.friendly,
             self.file_path, self.anim_gif_path, self.h264_path]
 
   @staticmethod
@@ -262,21 +294,20 @@ class Loader(object):
   @staticmethod
   def LoadMap(fname):
     """Load the Riven node map from the given file."""
-    pos_id = 1
-    riven = Map()
+    riven_map = Map()
     with open(os.path.join(fname)) as data_file:
       json_islands = json.load(data_file)
       for json_island in json_islands:
         island_symbol = json_island['symbol']
-        pos_array = []
+        island = Island(island_symbol)
+        riven_map.islands[island_symbol] = island
         for json_position in json_island['positions']:
-          position = Position(ord(island_symbol), pos_id)
-          pos_id += 1
+          position = Position(json_position['name'], island)
           for json_viewpoint in json_position['viewpoints']:
-            position.viewpoint_names.append(json_viewpoint['id'])
-          pos_array.append(position)
-        riven.islands[island_symbol] = pos_array
-    return riven
+            viewpoint = island.GetViewpoint(json_viewpoint['id'])
+            position.viewpoints[viewpoint.name] = viewpoint
+          island.positions[position.name] = position
+    return riven_map
 
   @staticmethod
   def SwapExtension(fname, newextn):
@@ -386,8 +417,8 @@ class Loader(object):
 
     anim_images = []
     for viewpoint in viewpoints:
-      if position.island_id == viewpoint.island_id and \
-         viewpoint.name in position.viewpoint_names:
+      if position.island.id == viewpoint.island.id and \
+         viewpoint.name in position.viewpoints:
         anim_images.append(Loader.ProtectPath(viewpoint.thumbnail))
 
     if not len(anim_images):
@@ -397,7 +428,7 @@ class Loader(object):
       outfile = anim_images[0]
     else:
       outfile = os.path.join(os.path.dirname(anim_images[0]),
-          'position_%d_thumbnail.gif' % position.pos_id)
+          'position_%d_thumbnail.gif' % position.id)
       futures.append(executor.submit(Loader.CreateAnimatedGif,
                                      anim_images, outfile))
     position.thumbnail = Loader.UnprotectPath(outfile)
@@ -457,15 +488,15 @@ class Loader(object):
   def CreateViewpointThumbnails(viewpoints, images, movies):
     view2img = dict()
     for image in images:
-      if image.viewpoint_id not in view2img:
-        view2img[image.viewpoint_id] = []
-      view2img[image.viewpoint_id].append(image)
+      if image.viewpoint.id not in view2img:
+        view2img[image.viewpoint.id] = []
+      view2img[image.viewpoint.id].append(image)
 
     view2mov = dict()
     for movie in movies:
-      if movie.viewpoint_id not in view2mov:
-        view2mov[movie.viewpoint_id] = []
-      view2mov[movie.viewpoint_id].append(movie)
+      if movie.viewpoint.id not in view2mov:
+        view2mov[movie.viewpoint.id] = []
+      view2mov[movie.viewpoint.id].append(movie)
 
     executor = ThreadPoolExecutor(max_workers=num_cpus)
     futures = []
@@ -490,61 +521,41 @@ class Loader(object):
       for f in futures:
         f.result()
 
-  @staticmethod
-  def FindPositionID(positions, viewpoint_name):
-    if not positions:
-      return None
-    for position in positions:
-      if viewpoint_name in position.viewpoint_names:
-        return position.pos_id
-    return None
-
   def LoadData(self, conn):
+    """Create the rest of the Riven map based on the image/movie data."""
     island_to_imgvpt = self.LoadFiles('png')
     island_to_movvpt = self.LoadFiles('mov')
     c = conn.cursor()
 
-    islands = []
-    for island_symbol in island_to_imgvpt.keys():
-      islands.append(Island(island_symbol).sqlrow())
-    c.executemany('INSERT INTO islands VALUES %s' % Island.insert(), islands)
-
     riven = Loader.LoadMap('map.json')
 
-    viewpoints = []
-    vpt_id = 1
     images = []
-    movies = []
-    img_id = 1
-    island_vpt_to_vpt_id = dict()
-    for island_symbol in island_to_imgvpt.keys():
-      island_posns = None
+    for island_symbol in island_to_imgvpt:
       if island_symbol in riven.islands:
-        island_posns = riven.islands[island_symbol]
-      for vpt in island_to_imgvpt[island_symbol]:
-        pos_id = Loader.FindPositionID(island_posns, vpt)
-        viewpoints.append(Viewpoint(vpt_id, ord(island_symbol), pos_id, vpt))
+        island = riven.islands[island_symbol]
+      else:
+        island = Island(island_symbol)
+        riven.islands[island_symbol] = island
+      for viewpoint_name in island_to_imgvpt[island_symbol]:
+        viewpoint = island.GetViewpoint(viewpoint_name)
+        viewpoint.position = island.FindPosition(viewpoint_name)
         viewpoint_to_info = island_to_imgvpt[island_symbol]
-        for info in viewpoint_to_info[vpt]:
-          island_vpt_to_vpt_id[(island_symbol, vpt)] = vpt_id
+        for info in viewpoint_to_info[viewpoint_name]:
           file_path = Loader.UnprotectPath(info.file_path)
-          images.append(RivenImg(img_id, vpt_id, info.filename(),
+          images.append(RivenImg(viewpoint, info.filename(),
                         info.friendly_name(), file_path))
-          img_id += 1
-        vpt_id += 1
-    mov_id = 1
     executor = ThreadPoolExecutor(max_workers=num_cpus)
     futures = []
-    all_positions = []
-    for island_symbol in island_to_movvpt.keys():
-      island_posns = None
+    movies = []
+    for island_symbol in island_to_movvpt:
       if island_symbol in riven.islands:
-        island_posns = riven.islands[island_symbol]
-        all_positions.extend(island_posns)
-      for vpt in island_to_movvpt[island_symbol]:
-        pos_id = Loader.FindPositionID(island_posns, vpt)
+        island = riven.islands[island_symbol]
+      else:
+        island = Island(island_symbol)
+        riven[island_symbol] = island
+      for viewpoint_name in island_to_movvpt[island_symbol]:
         viewpoint_to_info = island_to_movvpt[island_symbol]
-        for info in viewpoint_to_info[vpt]:
+        for info in viewpoint_to_info[viewpoint_name]:
           gif_path = Loader.SwapExtension(info.file_path, 'gif')
           if not os.path.exists(gif_path):
             futures.append(executor.submit(Loader.TranscodeMovie,
@@ -553,30 +564,36 @@ class Loader(object):
           if not os.path.exists(h264_path):
             futures.append(executor.submit(Loader.MakeH264,
                                            info.file_path, h264_path))
-          key = (island_symbol, vpt)
-          if not key in island_vpt_to_vpt_id:
-            # If not present, then there was not an image here, the movie is the
-            # first file.
-            viewpoints.append(Viewpoint(vpt_id, ord(island_symbol), pos_id, vpt))
-            island_vpt_to_vpt_id[(island_symbol, vpt)] = vpt_id
-            vpt_id += 1
-          mov_vpt_id = island_vpt_to_vpt_id[key]
+          viewpoint = island.GetViewpoint(viewpoint_name)
           gif_path = Loader.UnprotectPath(gif_path);
           h264_path = Loader.UnprotectPath(h264_path);
-          movies.append(RivenMovie(mov_id, mov_vpt_id, info.filename(),
+          movies.append(RivenMovie(viewpoint, info.filename(),
                          info.friendly_name(),
                          info.file_path, gif_path, h264_path))
-          mov_id += 1
-    Loader.CreateViewpointThumbnails(viewpoints, images, movies)
+    all_islands = []
+    all_viewpoints = []
+    all_positions = []
+    for island_symbol in riven.islands:
+      all_islands.append(riven.islands[island_symbol])
+      viewpoints = riven.islands[island_symbol].viewpoints
+      for viewpoint_name in viewpoints:
+        all_viewpoints.append(viewpoints[viewpoint_name])
+      positions = riven.islands[island_symbol].positions
+      for position_name in positions:
+        all_positions.append(positions[position_name])
+    Loader.CreateViewpointThumbnails(all_viewpoints, images, movies)
     futures.extend(Loader.CreateAllPositionImageThumbnails(all_positions,
-                                                           viewpoints,
+                                                           all_viewpoints,
                                                            executor))
     if (len(futures)):
       print('Waiting for file transcoding to finish...')
       for f in futures:
         f.result()
+
+    c.executemany('INSERT INTO islands VALUES %s' % Island.insert(),
+                  [i.sqlrow() for i in all_islands])
     c.executemany('INSERT INTO viewpoints VALUES %s' % Viewpoint.insert(),
-                  [v.sqlrow() for v in viewpoints])
+                  [v.sqlrow() for v in all_viewpoints])
     c.executemany('INSERT INTO positions VALUES %s' % Position.insert(),
                   [p.sqlrow() for p in all_positions])
     c.executemany('INSERT INTO rivenimgs VALUES %s' % RivenImg.insert(),

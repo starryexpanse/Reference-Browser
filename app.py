@@ -72,6 +72,7 @@ class Island(db.Model):
 class Position(db.Model):
   __tablename__ = 'positions'
   id = db.Column('position_id', db.Integer, primary_key = True)
+  name = db.Column('name', db.String(128))
   thumbnail = db.Column(db.String(256))
   island = db.Column('island', db.ForeignKey('islands.island_id'),
                      nullable=False)
