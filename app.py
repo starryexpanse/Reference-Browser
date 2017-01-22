@@ -29,6 +29,14 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
+class Globals(db.Model, UserMixin):
+  __tablename__ = 'globals'
+  global_id = db.Column('global_id', db.Integer, primary_key = True)
+  thumbnail_width = db.Column('thumbnail_width', db.Integer)
+  thumbnail_height = db.Column('thumbnail_height', db.Integer)
+  thumbnail2x_width = db.Column('thumbnail2x_width', db.Integer)
+  thumbnail2x_height = db.Column('thumbnail2x_height', db.Integer)
+
 class User(db.Model, UserMixin):
   __tablename__ = 'users'
   id = db.Column('user_id', db.Integer, primary_key = True)
@@ -171,6 +179,7 @@ def logout():
 @app.route('/island/<symbol>')
 @login_required
 def island(symbol):
+  g = Globals.query.filter(Globals.global_id == 1).first()
   island = Island.query.filter(Island.symbol == symbol).first()
   if not island:
     return 'There is no "%s" island.' % symbol
@@ -219,7 +228,11 @@ def island(symbol):
         island_symbol=island.symbol,
         use_unveil=True,
         position_count=pos_query.count(),
-        viewpoint_count=vpt_query.count())
+        viewpoint_count=vpt_query.count(),
+        thumbnail_width=g.thumbnail_width,
+        thumbnail_height=g.thumbnail_height,
+        thumbnail2x_width=g.thumbnail2x_width,
+        thumbnail2x_height=g.thumbnail2x_height)
 
 @app.route('/viewpoints')
 @login_required

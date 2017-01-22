@@ -45,7 +45,7 @@
       {% for position in positions %}
         <a class="btn btn-default position-btn" href="{{ url_for('island', symbol=island_symbol, position=position.id) }}">
           <img src="{{ url_for('protected', filename=position.thumbnail) }}"
-               width="109" height="70"><br>
+               width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
         </a>
       {% endfor %}
       {% endif %}
@@ -57,10 +57,10 @@
            <img src="{{ url_for('static', filename='images/bg.png') }}"
                data-src="{{ url_for('protected', filename=viewpoint.thumbnail) }}"
                data-src-retina="{{ url_for('protected', filename=viewpoint.thumbnail2x) }}"
-               width="109" height="70"><br>
+               width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
            {% else %}
              <img src="{{ url_for('protected', filename=viewpoint.thumbnail) }}"
-                 width="109" height="70"><br>
+                 width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
            {% endif %}
            {{ viewpoint.name }}
          </a>

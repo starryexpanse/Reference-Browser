@@ -13,9 +13,38 @@ import sys
 
 num_cpus = multiprocessing.cpu_count()
 NumImagePixels = 238336
+StandardImageSize = [608, 392]
 
 class InvalidPathException(Exception):
   pass
+
+class Globals(object):
+  def __init__(self):
+    self.global_id = 1
+    self.thumbnail_size = [int(v * Loader.thumbnail_sf) for v in StandardImageSize]
+    self.thumbnail2x_size = [int(v * Loader.thumbnail2x_sf) for v in
+                             StandardImageSize]
+
+  def sqlrow(self):
+    row = [self.global_id]
+    row.extend(self.thumbnail_size)
+    row.extend(self.thumbnail2x_size)
+    return row
+
+  @staticmethod
+  def insert():
+    return '(?,?,?,?,?)'
+
+  @staticmethod
+  def CreateTable(conn):
+    c = conn.cursor()
+    c.execute('''CREATE TABLE globals
+              (global_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              thumbnail_width INTEGER,
+              thumbnail_height INTEGER,
+              thumbnail2x_width INTEGER,
+              thumbnail2x_height INTEGER)''')
+    conn.commit()
 
 class Island(object):
   # name, AKA, Suffix, icon
@@ -177,7 +206,7 @@ class RivenMovie(object):
 class Loader(object):
   protected_dir = 'protected'
   thumbnail_sf = 0.18
-  thumbnail2x_sf = 0.36
+  thumbnail2x_sf = thumbnail_sf * 2
 
   def __init__(self, top_dir):
     self.top_dir = top_dir
@@ -213,11 +242,16 @@ class Loader(object):
               username TEXT, name TEXT)''')
     conn.commit()
 
+    Globals.CreateTable(conn)
     Island.CreateTable(conn)
     Position.CreateTable(conn)
     Viewpoint.CreateTable(conn)
     RivenImg.CreateTable(conn)
     RivenMovie.CreateTable(conn)
+
+    g = Globals()
+    c.executemany('INSERT INTO globals VALUES %s' % Globals.insert(),
+                  [g.sqlrow()])
 
     conn.commit()
 
