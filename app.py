@@ -224,6 +224,40 @@ def island(symbol):
       thumbnail2x_width=g.thumbnail2x_width,
       thumbnail2x_height=g.thumbnail2x_height)
 
+def GetViewpointMatrix(viewpoint):
+  return {
+    'island_symbol': chr(viewpoint.island),
+    'viewpoint_name': viewpoint.name,
+    'thumbnail': viewpoint.thumbnail,
+    'thumbnail2x': viewpoint.thumbnail2x
+  }
+
+def LoadViewpoint(viewpoint_id):
+  return Viewpoint.query.filter(Viewpoint.id == viewpoint_id).first()
+
+def FillViewpointMatrixColumn(m, viewpoint, col):
+  if viewpoint.up_viewpoint:
+    m[0][col] = GetViewpointMatrix(LoadViewpoint(viewpoint.up_viewpoint))
+  m[1][col] = GetViewpointMatrix(viewpoint)
+  if viewpoint.down_viewpoint:
+    m[2][col] = GetViewpointMatrix(LoadViewpoint(viewpoint.down_viewpoint))
+
+def CreateViewpointMatrix(viewpoint):
+  # LU, CU, RU, RRU
+  # L , C , R , RR
+  # LL, CL, RL, RRL
+  m = [[None for x in range(4)] for y in range(3)]
+  FillViewpointMatrixColumn(m, viewpoint, 1)
+  if viewpoint.left_viewpoint:
+    FillViewpointMatrixColumn(m, LoadViewpoint(viewpoint.left_viewpoint), 0)
+  if viewpoint.right_viewpoint:
+    right_viewpoint = LoadViewpoint(viewpoint.right_viewpoint)
+    FillViewpointMatrixColumn(m, right_viewpoint, 2)
+    if right_viewpoint.right_viewpoint:
+      FillViewpointMatrixColumn(m, LoadViewpoint(right_viewpoint.right_viewpoint), 3)
+
+  return m
+
 @app.route('/island/<symbol>/viewpoint/<vpt_name>', strict_slashes=False)
 @login_required
 def viewpoint(symbol, vpt_name):
@@ -232,9 +266,8 @@ def viewpoint(symbol, vpt_name):
   if not island:
     return 'There is no "%s" island.' % symbol
 
-  vpt_query = Viewpoint.query.filter(
-      Viewpoint.island == island.id, Viewpoint.name == vpt_name)
-  viewpoint = vpt_query.first()
+  viewpoint = Viewpoint.query.filter(Viewpoint.island == island.id,
+                                     Viewpoint.name == vpt_name).first()
   if not viewpoint:
     return 'There is no "%s" viewpoint.' % vpt_name
   title = '%s Viewpoint %s' % (island.title(), viewpoint.name)
@@ -252,6 +285,9 @@ def viewpoint(symbol, vpt_name):
       Viewpoint.name > viewpoint.name).order_by(Viewpoint.name.asc()).first()
   if next_vpt:
     next_vpt = next_vpt.name
+
+  vpt_matrix = CreateViewpointMatrix(viewpoint)
+
   return render_template('viewpoint.html',
       images=img_query,
       movies=mov_query,
@@ -261,7 +297,10 @@ def viewpoint(symbol, vpt_name):
       movie_count=mov_query.count(),
       island_symbol=island.symbol,
       prev_vpt=prev_vpt,
-      next_vpt=next_vpt)
+      next_vpt=next_vpt,
+      thumbnail_width=g.thumbnail_width,
+      thumbnail_height=g.thumbnail_height,
+      vpt_matrix=json.dumps(vpt_matrix))
 
 @app.route('/viewpoints')
 @login_required

@@ -50,6 +50,10 @@
         </a>
       </p>
 
+      <h2>Adjacent Viewpoints</h2>
+      <table id="connections">
+      </table>
+
       {% if movie_count > 0 %}
       <h2>Movies ({{ movie_count }})</h2>
       <ol>
@@ -86,8 +90,41 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="{{ url_for('static', filename='js/jquery.unveil.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
+    <script type="text/javascript">
+      function loadTable(tableData) {
+        var table = document.getElementById('connections');
+        for (var r = 0; r < tableData.length; r++) {
+          var tr = document.createElement('tr');
+          var tableRow = tableData[r];
+          for (var c = 0; c < tableRow.length; c++) {
+            var td = document.createElement('td');
+            if (tableRow[c]) {
+              var a = document.createElement('a');
+              a.setAttribute("href", "/island/" + tableRow[c]['island_symbol'] +
+                  '/viewpoint/' + tableRow[c]['viewpoint_name']);
+              var img = document.createElement('img');
+              img.setAttribute("class", "img-responsive");
+              img.setAttribute("width", "{{ thumbnail_width }}");
+              img.setAttribute("height", "{{ thumbnail_height }}");
+              img.setAttribute("src", "/static/images/bg.png");
+              img.setAttribute("data-src", "/protected/" + tableRow[c]['thumbnail']);
+              img.setAttribute("data-src-retina", "/protected/" + tableRow[c]['thumbnail2x']);
+              a.appendChild(img);
+              td.appendChild(a);
+            }
+            tr.appendChild(td);
+          }
+          table.appendChild(tr);
+        }
+      }
+      $(document).ready(function() {
+        loadTable( {{ vpt_matrix|safe }});
+        $("img").unveil();
+      });
+    </script>
   </body>
 </html>
