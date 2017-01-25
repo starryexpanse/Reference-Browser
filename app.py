@@ -199,7 +199,7 @@ def logout():
   logout_user()
   return redirect(url_for('islands'))
 
-@app.route('/island/<symbol>')
+@app.route('/island/<symbol>', strict_slashes=False)
 @login_required
 def island(symbol):
   g = Globals.query.filter(Globals.global_id == 1).first()
@@ -207,55 +207,61 @@ def island(symbol):
   if not island:
     return 'There is no "%s" island.' % symbol
 
-  vpt_name = request.args.get('viewpoint', '')
-  if vpt_name:
-    vpt_query = Viewpoint.query.filter(
-        Viewpoint.island == island.id, Viewpoint.name == vpt_name)
-    viewpoint = vpt_query.first()
-    if not viewpoint:
-      return 'There is no "%s" viewpoint.' % vpt_name
-    title = '%s Viewpoint %s' % (island.title(), viewpoint.name)
-    img_query=RivenImage.query.filter(
-        RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.friendly)
-    mov_query=RivenMovie.query.filter(
-        RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.friendly)
-    prev_vpt = Viewpoint.query.filter(
-        Viewpoint.island == island.id,
-        Viewpoint.name < viewpoint.name).order_by(Viewpoint.name.desc()).first()
-    if prev_vpt:
-      prev_vpt = prev_vpt.name
-    next_vpt = Viewpoint.query.filter(
-        Viewpoint.island == island.id,
-        Viewpoint.name > viewpoint.name).order_by(Viewpoint.name.asc()).first()
-    if next_vpt:
-      next_vpt = next_vpt.name
-    return render_template('viewpoint.html',
-        images=img_query,
-        movies=mov_query,
-        island_name=island.title(),
-        title=title,
-        image_count=img_query.count(),
-        movie_count=mov_query.count(),
-        island_symbol=island.symbol,
-        prev_vpt=prev_vpt,
-        next_vpt=next_vpt)
-  else:
-    vpt_query=Viewpoint.query.filter(
-        Viewpoint.island == island.id).order_by(Viewpoint.name)
-    pos_query=Position.query.filter(
-        Position.island == island.id).order_by(Position.id)
-    return render_template('island.html',
-        viewpoints=vpt_query,
-        positions=pos_query,
-        island_name=island.title(),
-        island_symbol=island.symbol,
-        use_unveil=True,
-        position_count=pos_query.count(),
-        viewpoint_count=vpt_query.count(),
-        thumbnail_width=g.thumbnail_width,
-        thumbnail_height=g.thumbnail_height,
-        thumbnail2x_width=g.thumbnail2x_width,
-        thumbnail2x_height=g.thumbnail2x_height)
+  vpt_query=Viewpoint.query.filter(
+      Viewpoint.island == island.id).order_by(Viewpoint.name)
+  pos_query=Position.query.filter(
+      Position.island == island.id).order_by(Position.id)
+  return render_template('island.html',
+      viewpoints=vpt_query,
+      positions=pos_query,
+      island_name=island.title(),
+      island_symbol=island.symbol,
+      use_unveil=True,
+      position_count=pos_query.count(),
+      viewpoint_count=vpt_query.count(),
+      thumbnail_width=g.thumbnail_width,
+      thumbnail_height=g.thumbnail_height,
+      thumbnail2x_width=g.thumbnail2x_width,
+      thumbnail2x_height=g.thumbnail2x_height)
+
+@app.route('/island/<symbol>/viewpoint/<vpt_name>', strict_slashes=False)
+@login_required
+def viewpoint(symbol, vpt_name):
+  g = Globals.query.filter(Globals.global_id == 1).first()
+  island = Island.query.filter(Island.symbol == symbol).first()
+  if not island:
+    return 'There is no "%s" island.' % symbol
+
+  vpt_query = Viewpoint.query.filter(
+      Viewpoint.island == island.id, Viewpoint.name == vpt_name)
+  viewpoint = vpt_query.first()
+  if not viewpoint:
+    return 'There is no "%s" viewpoint.' % vpt_name
+  title = '%s Viewpoint %s' % (island.title(), viewpoint.name)
+  img_query=RivenImage.query.filter(
+      RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.friendly)
+  mov_query=RivenMovie.query.filter(
+      RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.friendly)
+  prev_vpt = Viewpoint.query.filter(
+      Viewpoint.island == island.id,
+      Viewpoint.name < viewpoint.name).order_by(Viewpoint.name.desc()).first()
+  if prev_vpt:
+    prev_vpt = prev_vpt.name
+  next_vpt = Viewpoint.query.filter(
+      Viewpoint.island == island.id,
+      Viewpoint.name > viewpoint.name).order_by(Viewpoint.name.asc()).first()
+  if next_vpt:
+    next_vpt = next_vpt.name
+  return render_template('viewpoint.html',
+      images=img_query,
+      movies=mov_query,
+      island_name=island.title(),
+      title=title,
+      image_count=img_query.count(),
+      movie_count=mov_query.count(),
+      island_symbol=island.symbol,
+      prev_vpt=prev_vpt,
+      next_vpt=next_vpt)
 
 @app.route('/viewpoints')
 @login_required

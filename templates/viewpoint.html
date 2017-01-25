@@ -42,10 +42,10 @@
 
       <h1>{{ title }}</h1>
       <p>
-        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol, viewpoint=prev_vpt) }}">
+        <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=prev_vpt) }}">
           <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         </a>
-        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol, viewpoint=next_vpt) }}">
+        <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=next_vpt) }}">
           <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
         </a>
       </p>

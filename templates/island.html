@@ -52,7 +52,7 @@
 
       <h2>Viewpoints ({{viewpoint_count}})</h2>
       {% for viewpoint in viewpoints %}
-         <a class="btn btn-default position-btn" href="{{ url_for('island', symbol=island_symbol, viewpoint=viewpoint.name) }}">
+         <a class="btn btn-default position-btn" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=viewpoint.name) }}">
            {% if use_unveil %}
            <img src="{{ url_for('static', filename='images/bg.png') }}"
                data-src="{{ url_for('protected', filename=viewpoint.thumbnail) }}"
