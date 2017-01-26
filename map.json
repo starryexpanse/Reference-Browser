@@ -3,28 +3,54 @@
     "symbol": "T",
     "positions": [
       {
+        "name": "start",
+        "viewpoints": [
+          {
+            "name": "159",
+            "left": "158",
+            "right": "158",
+            "link": "130"
+          },
+          {
+            "name": "158",
+            "left": "159",
+            "right": "159"
+          }
+        ]
+      },
+      {
         "name": "1",
         "viewpoints": [
           {
-            "name": "128",
-            "left": "129",
-            "right": "130"
-          },
-          {
-            "name": "129"
-          },
-          {
             "name": "130",
-            "left": "T/128"
+            "left": "129",
+            "right": "134",
+            "forward": "136"
           },
           {
-            "name": "134"
+            "name": "129",
+            "left": "128",
+            "right": "130",
+            "up": "133"
           },
           {
-            "name": "157"
+            "name": "128",
+            "left": "134",
+            "right": "129",
+            "up": "157"
           },
           {
-            "name": "133"
+            "name": "134",
+            "left": "130",
+            "right": "128"
+          },
+          {
+            "name": "157",
+            "down": "128"
+          },
+          {
+            "name": "133",
+            "down": "129"
           }
         ]
       },
@@ -32,19 +58,25 @@
         "name": "2",
         "viewpoints": [
           {
-            "name": "264"
+            "name": "136",
+            "right": "140",
+            "left": "137",
+            "forward": "138"
           },
           {
-            "name": "265"
+            "name": "140",
+            "right": "148",
+            "left": "136"
           },
           {
-            "name": "266"
+            "name": "148",
+            "right": "137",
+            "left": "140"
           },
           {
-            "name": "267"
-          },
-          {
-            "name": "268"
+            "name": "137",
+            "right": "136",
+            "left": "148"
           }
         ]
       },
@@ -52,308 +84,87 @@
         "name": "3",
         "viewpoints": [
           {
-            "name": "138"
+            "name": "138",
+            "right": "143",
+            "left": "141",
+            "forward": "144,142"
           },
           {
-            "name": "143"
+            "name": "143",
+            "right": "141",
+            "left": "138",
+            "forward": "139"
           },
           {
-            "name": "141"
+            "name": "141",
+            "right": "138",
+            "left": "143",
+            "forward": "128"
           }
         ]
       },
       {
-        "name": "4",
+        "name": "hatch",
         "viewpoints": [
           {
-            "name": "142"
+            "name": "144",
+            "backward": "138"
           }
         ]
       },
       {
-        "name": "5",
+        "name": "bullseye",
         "viewpoints": [
           {
-            "name": "149"
-          },
-          {
-            "name": "154"
-          },
-          {
-            "name": "150"
+            "name": "142",
+            "backward": "138"
           }
         ]
       },
       {
-        "name": "6",
+        "name": "right-of-hatch",
         "viewpoints": [
           {
-            "name": "131"
+            "name": "139",
+            "right": "150",
+            "left": "149",
+            "forward": "151"
           },
           {
-            "name": "111"
+            "name": "150",
+            "right": "154",
+            "left": "139"
           },
           {
-            "name": "122"
+            "name": "154",
+            "right": "149",
+            "left": "150"
+          },
+          {
+            "name": "149",
+            "right": "139",
+            "left": "154"
           }
         ]
       },
       {
-        "name": "7",
+        "name": "rr-hatch",
         "viewpoints": [
           {
-            "name": "123"
+            "name": "151",
+            "right": "152",
+            "left": "152",
+            "down": "153"
           },
           {
-            "name": "120"
+            "name": "152",
+            "left": "151",
+            "right": "151",
+            "forward": "154"
           },
           {
-            "name": "121"
-          },
-          {
-            "name": "124"
-          }
-        ]
-      },
-      {
-        "name": "8",
-        "viewpoints": [
-          {
-            "name": "123"
-          },
-          {
-            "name": "126"
-          },
-          {
-            "name": "118"
-          }
-        ]
-      },
-      {
-        "name": "9",
-        "viewpoints": [
-          {
-            "name": "119"
-          },
-          {
-            "name": "117"
-          },
-          {
-            "name": "115"
-          }
-        ]
-      },
-      {
-        "name": "10",
-        "viewpoints": [
-          {
-            "name": "116"
-          },
-          {
-            "name": "114"
-          },
-          {
-            "name": "112"
-          }
-        ]
-      },
-      {
-        "name": "11",
-        "viewpoints": [
-          {
-            "name": "113"
-          },
-          {
-            "name": "111"
-          },
-          {
-            "name": "110"
-          }
-        ]
-      },
-      {
-        "name": "12",
-        "viewpoints": [
-          {
-            "name": "90"
-          },
-          {
-            "name": "86"
-          },
-          {
-            "name": "84"
-          },
-          {
-            "name": "87"
-          }
-        ]
-      },
-      {
-        "name": "13",
-        "viewpoints": [
-          {
-            "name": "89"
-          },
-          {
-            "name": "98"
-          },
-          {
-            "name": "99"
-          }
-        ]
-      },
-      {
-        "name": "14",
-        "viewpoints": [
-          {
-            "name": "97"
-          },
-          {
-            "name": "98"
-          },
-          {
-            "name": "99"
-          }
-        ]
-      },
-      {
-        "name": "15",
-        "viewpoints": [
-          {
-            "name": "100"
-          },
-          {
-            "name": "104"
-          },
-          {
-            "name": "102"
-          }
-        ]
-      },
-      {
-        "name": "16",
-        "viewpoints": [
-          {
-            "name": "103"
-          },
-          {
-            "name": "106"
-          },
-          {
-            "name": "107"
-          },
-          {
-            "name": "105"
-          }
-        ]
-      },
-      {
-        "name": "17",
-        "viewpoints": [
-          {
-            "name": "108"
-          }
-        ]
-      },
-      {
-        "name": "18",
-        "viewpoints": [
-          {
-            "name": "252"
-          },
-          {
-            "name": "109"
-          }
-        ]
-      },
-      {
-        "name": "19",
-        "viewpoints": [
-          {
-            "name": "251"
-          },
-          {
-            "name": "248"
-          }
-        ]
-      },
-      {
-        "name": "20",
-        "viewpoints": [
-          {
-            "name": "246"
-          },
-          {
-            "name": "247"
-          }
-        ]
-      },
-      {
-        "name": "21",
-        "viewpoints": [
-          {
-            "name": "249"
-          }
-        ]
-      },
-      {
-        "name": "22",
-        "viewpoints": [
-          {
-            "name": "250"
-          }
-        ]
-      },
-      {
-        "name": "23",
-        "viewpoints": [
-          {
-            "name": "253"
-          }
-        ]
-      },
-      {
-        "name": "24",
-        "viewpoints": [
-          {
-            "name": "161"
-          },
-          {
-            "name": "88"
-          }
-        ]
-      },
-      {
-        "name": "25",
-        "viewpoints": [
-          {
-            "name": "162"
-          },
-          {
-            "name": "165"
-          },
-          {
-            "name": "168"
-          }
-        ]
-      },
-      {
-        "name": "26",
-        "viewpoints": [
-          {
-            "name": "167"
-          },
-          {
-            "name": "177"
-          },
-          {
-            "name": "166"
-          },
-          {
-            "name": "199"
-          },
-          {
-            "name": "200"
+            "name": "153",
+            "up": "151"
           }
         ]
       }

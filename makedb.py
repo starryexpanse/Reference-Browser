@@ -125,10 +125,11 @@ class Island(object):
   def graphviz_title(self):
     return self.name
 
-  def AddGraphVizData(self, dot):
-    dot.node(self.graphviz_name, self.graphviz_title)
+  def AddGraphVizData(self, map_graph):
+    island_graph = Digraph(name=self.graphviz_name)
     for position_name in self.positions:
-      self.positions[position_name].AddGraphVizData(dot)
+      self.positions[position_name].AddGraphVizData(island_graph)
+    map_graph.subgraph(island_graph)
 
 class Position(object):
   next_id = 1
@@ -167,11 +168,11 @@ class Position(object):
   def graphviz_title(self):
     return 'P%s' % self.name
 
-  def AddGraphVizData(self, dot):
-    dot.node(self.graphviz_name, self.graphviz_title)
+  def AddGraphVizData(self, island_graph):
+    position_graph = Digraph(name=self.graphviz_name)
     for viewpoint_name in self.viewpoints:
-      self.viewpoints[viewpoint_name].AddGraphVizData(dot)
-    dot.edge(self.island.graphviz_name, self.graphviz_name)
+      self.viewpoints[viewpoint_name].AddGraphVizData(position_graph)
+    island_graph.subgraph(position_graph)
 
 class Viewpoint(object):
   next_id = 1
@@ -242,21 +243,22 @@ class Viewpoint(object):
   def graphviz_title(self):
     return 'V%s' % self.name
 
-  def AddGraphVizData(self, dot):
-    dot.node(self.graphviz_name, self.graphviz_title)
-    dot.edge(self.position.graphviz_name, self.graphviz_name)
+  def AddGraphVizData(self, position_graph):
+    position_graph.node(name=self.graphviz_name, title=self.graphviz_title,
+                        shape='rect',
+                        image=Loader.ProtectPath(self.thumbnail2x))
     if self.left_viewpoint:
-      dot.edge(self.graphviz_name, self.left_viewpoint.graphviz_name, 'L')
+      position_graph.edge(self.graphviz_name, self.left_viewpoint.graphviz_name, 'L')
     if self.right_viewpoint:
-      dot.edge(self.graphviz_name, self.right_viewpoint.graphviz_name, 'R')
+      position_graph.edge(self.graphviz_name, self.right_viewpoint.graphviz_name, 'R')
     if self.up_viewpoint:
-      dot.edge(self.graphviz_name, self.up_viewpoint.graphviz_name, 'U')
+      position_graph.edge(self.graphviz_name, self.up_viewpoint.graphviz_name, 'U')
     if self.down_viewpoint:
-      dot.edge(self.graphviz_name, self.down_viewpoint.graphviz_name, 'D')
+      position_graph.edge(self.graphviz_name, self.down_viewpoint.graphviz_name, 'D')
     if self.forward_viewpoint:
-      dot.edge(self.graphviz_name, self.forward_viewpoint.graphviz_name, 'F')
+      position_graph.edge(self.graphviz_name, self.forward_viewpoint.graphviz_name, 'F')
     if self.backward_viewpoint:
-      dot.edge(self.graphviz_name, self.backward_viewpoint.graphviz_name, 'B')
+      position_graph.edge(self.graphviz_name, self.backward_viewpoint.graphviz_name, 'B')
 
 class RivenImg(object):
   next_id = 1
@@ -389,6 +391,10 @@ class Loader(object):
 
   @staticmethod
   def ParseIslandViewpoint(current_island, viewpoint_name):
+    items = viewpoint_name.split(',')
+    if len(items) > 1:
+      print("Don't currently support multiple forward links")
+      viewpoint_name = items[0]
     items = viewpoint_name.split('/')
     if len(items) == 2:
       return (items[0], items[1])
@@ -670,7 +676,6 @@ class Loader(object):
     c = conn.cursor()
 
     riven = Loader.LoadMap('map.json')
-    riven.WriteGraphViz('riven.dot')
 
     executor = ThreadPoolExecutor(max_workers=num_cpus)
     futures = []
@@ -738,6 +743,8 @@ class Loader(object):
       print('Waiting for file transcoding to finish...')
       for f in futures:
         f.result()
+
+    riven.WriteGraphViz('riven.dot')
 
     c.executemany('INSERT INTO islands VALUES %s' % Island.insert(),
                   [i.sqlrow() for i in all_islands])
