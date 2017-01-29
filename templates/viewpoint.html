@@ -42,10 +42,18 @@
 
       <h1>{{ title }}</h1>
       <p>
+      {% if prev_vpt %}
         <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=prev_vpt) }}">
+      {% else %}
+        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">
+      {% endif %}
           <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         </a>
+      {% if next_vpt %}
         <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=next_vpt) }}">
+      {% else %}
+        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">
+      {% endif %}
           <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
         </a>
       </p>
