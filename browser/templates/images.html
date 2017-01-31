@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang = "en">
    <head>
-     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+     <link rel="stylesheet" type="text/css" href="{{ url_for('browsing.static', filename='css/main.css') }}">
    </head>
    <body>
       <h3>
-         <a href = "{{ url_for('images') }}">Riven Images</a>
+         <a href = "{{ url_for('browsing.images') }}">Riven Images</a>
       </h3>
       <hr/>
       <p>
-         <a href = "{{ url_for('islands') }}">Riven Islands</a>
+         <a href = "{{ url_for('browsing.islands') }}">Riven Islands</a>
       </p>
       <p>
-         <a href = "{{ url_for('viewpoints') }}">Riven Viewpoints</a>
+         <a href = "{{ url_for('browsing.viewpoints') }}">Riven Viewpoints</a>
       </p>
       <table>
          <thead>

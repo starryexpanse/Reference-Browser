@@ -1,23 +1,24 @@
+app_dir='browser'
 
 .PHONY: default
 default: makedb
 
 .PHONY: cleanpositionthumbs
 cleanpositionthumbs:
-	find . -name '*thumbnail*.gif' | xargs rm
+	find $(app_dir) -name '*thumbnail*.gif' | xargs rm
 
 .PHONY: cleanthumbs
 cleanthumbs: cleanpositionthumbs
-	find . -name '*thumbnail*.png' | xargs rm
-	rm -rf protected/images
+	find $(app_dir) -name '*thumbnail*.png' | xargs rm
+	rm -rf $(app_dir)/protected/images
 
 .PHONY: cleangifs
 cleangifs:
-	find . -name '*.gif' | xargs rm
+	find $(app_dir) -name '*.gif' | xargs rm
 
 .PHONY: cleanmovies
 cleanmovies:
-	find . -name '*.m4v' | xargs rm
+	find $(app_dir) -name '*.m4v' | xargs rm
 
 .PHONY: clean
 clean: cleanthumbs

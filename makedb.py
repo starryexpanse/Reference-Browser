@@ -338,7 +338,7 @@ class RivenMovie(object):
     conn.commit()
 
 class Loader(object):
-  protected_dir = 'protected'
+  protected_dir = os.path.join('browser', 'protected')
   thumbnail_sf = 0.18
   thumbnail2x_sf = thumbnail_sf * 2
 
@@ -351,7 +351,7 @@ class Loader(object):
     """Add the protected directory as the parent.
 
     >>> Loader.ProtectPath(os.path.join('foo', 'bar.txt'))
-    'protected/foo/bar.txt'
+    'browser/protected/foo/bar.txt'
     """
     if Loader.protected_dir in path:
       raise InvalidPathException()

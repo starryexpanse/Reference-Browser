@@ -7,18 +7,18 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="A file browser for the Starry Expanse project">
     <meta name="author" content="Chris Mumford">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" href="{{ url_for('browsing.static', filename='favicon.ico') }}">
 
     <title>Reference Browser: {{ title }}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('browsing.static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+    <link href="{{ url_for('browsing.static', filename='css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link href="{{ url_for('browsing.static', filename='css/main.css') }}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -32,9 +32,9 @@
     <div class="page-header">
       <h1>Reference Browser<br><small>The Riven asset browser</small></h1>
       <div>
-        <a class="btn btn-default" href="{{ url_for('islands') }}">All Islands</a>
-        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">Back to Island ({{island_symbol}})</a>
-        <a class="btn btn-warning pull-right" href="{{ url_for('logout') }}">Sign Off</a>
+        <a class="btn btn-default" href="{{ url_for('browsing.islands') }}">All Islands</a>
+        <a class="btn btn-default" href="{{ url_for('browsing.island', symbol=island_symbol) }}">Back to Island ({{island_symbol}})</a>
+        <a class="btn btn-warning pull-right" href="{{ url_for('browsing.logout') }}">Sign Off</a>
       </div>
     </div>
 
@@ -43,16 +43,16 @@
       <h1>{{ title }}</h1>
       <p>
       {% if prev_vpt %}
-        <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=prev_vpt) }}">
+        <a class="btn btn-default" href="{{ url_for('browsing.viewpoint', symbol=island_symbol, vpt_name=prev_vpt) }}">
       {% else %}
-        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">
+        <a class="btn btn-default" href="{{ url_for('browsing.island', symbol=island_symbol) }}">
       {% endif %}
           <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         </a>
       {% if next_vpt %}
-        <a class="btn btn-default" href="{{ url_for('viewpoint', symbol=island_symbol, vpt_name=next_vpt) }}">
+        <a class="btn btn-default" href="{{ url_for('browsing.viewpoint', symbol=island_symbol, vpt_name=next_vpt) }}">
       {% else %}
-        <a class="btn btn-default" href="{{ url_for('island', symbol=island_symbol) }}">
+        <a class="btn btn-default" href="{{ url_for('browsing.island', symbol=island_symbol) }}">
       {% endif %}
           <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
         </a>
@@ -70,7 +70,7 @@
             <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
             <video class="img img-responsive"
                    width="{{movie.movie_width}}" height="{{movie.movie_height}}"
-                   src="{{ url_for('protected', filename=movie.h264_path) }}"
+                   src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
                    loop controls><p>don't support video</p></vid>
           </li>
         {% endfor %}
@@ -84,7 +84,7 @@
           <li>{{ image.friendly }}</br>
             <img class="img-responsive"
                  width="{{image.image_width}}" height="{{image.image_height}}"
-                 src="{{ url_for('protected', filename=image.file_path) }}">
+                 src="{{ url_for('browsing.protected', filename=image.file_path) }}">
           </li>
       {% endfor %}
       </ol>
@@ -98,10 +98,10 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="{{ url_for('static', filename='js/jquery.unveil.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('browsing.static', filename='js/jquery.unveil.js') }}"></script>
+    <script src="{{ url_for('browsing.static', filename='js/bootstrap.min.js') }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
+    <script src="{{ url_for('browsing.static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
     <script type="text/javascript">
       function loadTable(tableData) {
         var table = document.getElementById('connections');
@@ -118,7 +118,7 @@
               img.setAttribute("class", "img-responsive");
               img.setAttribute("width", "{{ thumbnail_width }}");
               img.setAttribute("height", "{{ thumbnail_height }}");
-              img.setAttribute("src", "/static/images/bg.png");
+              img.setAttribute("src", "/browsing.static/images/bg.png");
               img.setAttribute("data-src", "/protected/" + tableRow[c]['thumbnail']);
               img.setAttribute("data-src-retina", "/protected/" + tableRow[c]['thumbnail2x']);
               a.appendChild(img);
