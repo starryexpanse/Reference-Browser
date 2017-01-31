@@ -30,7 +30,7 @@ For creating the database:
 
 # Creating the database.
 
-1. Put the extracted game data in the protected/DVD folder.
+1. Put the extracted game data in the browser/protected/DVD folder.
 2. Run `make`. If you don't have make installed then `./makedb.py`
    or `python3 makedb.py`.
 
