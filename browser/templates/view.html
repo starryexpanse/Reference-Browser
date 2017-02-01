@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+
+  <h1>{{ title }}</h1>
+
+  {% if image  %}
+  <img class="img-responsive"
+       width="{{image.image_width}}" height="{{image.image_height}}"
+       src="{{ url_for('browsing.protected', filename=image.file_path) }}">
+  {% endif %}
+  {% if movie  %}
+  <video class="img img-responsive"
+         width="{{movie.movie_width}}" height="{{movie.movie_height}}"
+         src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
+         loop controls><p>don't support video</p></vid>
+  {% endif %}
+
+{% endblock %}

@@ -184,9 +184,9 @@ def viewpoint(symbol, vpt_name):
     return 'There is no "%s" viewpoint.' % vpt_name
   title = '%s Viewpoint %s' % (island.title(), viewpoint.name)
   img_query=RivenImage.query.filter(
-      RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.friendly)
+      RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.image_height)
   mov_query=RivenMovie.query.filter(
-      RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.friendly)
+      RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.movie_height)
   prev_vpt = Viewpoint.query.filter(
       Viewpoint.island == island.id,
       Viewpoint.name < viewpoint.name).order_by(Viewpoint.name.desc()).first()
@@ -217,6 +217,7 @@ def viewpoint(symbol, vpt_name):
       image_count=img_query.count(),
       movie_count=mov_query.count(),
       island_symbol=island.symbol,
+      vpt_name=vpt_name,
       prev_vpt=prev_vpt,
       next_vpt=next_vpt,
       thumbnail_width=g.thumbnail_width,
@@ -242,6 +243,40 @@ def view_obj(obj_name):
     return 'There is no "%s" object.' % obj_name
   return render_template('object.html',
     object=obj)
+
+@browsing.route('/island/<symbol>/viewpoint/<vpt_name>/view/<view_name>',
+                strict_slashes=False)
+@login_required
+def view(symbol, vpt_name, view_name):
+  island = Island.query.filter(Island.symbol == symbol).first()
+  if not island:
+    return 'There is no "%s" island.' % symbol
+
+  viewpoint = Viewpoint.query.filter(Viewpoint.island == island.id,
+                                     Viewpoint.name == vpt_name).first()
+  if not viewpoint:
+    return 'There is no "%s" viewpoint.' % vpt_name
+  image = None
+  movie = None
+  query=RivenImage.query.filter(RivenImage.viewpoint==viewpoint.id,
+                                RivenImage.friendly == view_name)
+  if query.count():
+    image = query.first()
+  else:
+    query=RivenMovie.query.filter(RivenMovie.viewpoint == viewpoint.id,
+                                  RivenMovie.friendly == view_name)
+    if query.count():
+      movie = query.first()
+  title = '%s / Viewpoint %s / %s' % (island.title(), viewpoint.name, view_name)
+
+  return render_template('view.html',
+      image=image,
+      movie=movie,
+      island_name=island.title(),
+      title=title,
+      viewpoint=viewpoint,
+      vpt_title='%s/%s' % (island.symbol, viewpoint.name),
+      island_symbol=island.symbol)
 
 @browsing.route('/viewpoints')
 @login_required

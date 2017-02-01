@@ -42,30 +42,39 @@
 
   {% if movie_count > 0 %}
   <h2>Movies ({{ movie_count }})</h2>
-  <ol>
-    {% for movie in movies %}
-      <li>
-        <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
-        <video class="img img-responsive"
-                width="{{movie.movie_width}}" height="{{movie.movie_height}}"
-                src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
-                loop controls><p>don't support video</p></vid>
-      </li>
-    {% endfor %}
-  </ol>
+  {% for column in movies | batch(2) -%}
+    <div class="row">
+      {%- for movie in column -%}
+        <div class="col-sm-6">
+          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=movie.friendly) }}">{{ movie.friendly }}</a></br>
+          <video class="img img-responsive"
+                 width="{{movie.movie_width}}" height="{{movie.movie_height}}"
+                 src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
+                 loop controls><p>don't support video</p></vid>
+        </div> <!-- /.col -->
+      {%- endfor -%}
+    </div> <!-- /.row -->
+  {%- endfor %}
   {% endif %}
 
   {% if image_count > 0 %}
   <h2>Images ({{image_count}})</h2>
-  <ol>
-  {% for image in images %}
-      <li>{{ image.friendly }}</br>
-        <img class="img-responsive"
-              width="{{image.image_width}}" height="{{image.image_height}}"
-              src="{{ url_for('browsing.protected', filename=image.file_path) }}">
-      </li>
-  {% endfor %}
-  </ol>
+
+  {% for column in images | batch(2) -%}
+    <div class="row">
+      {%- for image in column -%}
+        <div class="col-sm-6">
+          <p>{{ image.friendly }}</br>
+            <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=image.friendly) }}">
+              <img class="img-responsive"
+                   width="{{image.image_width}}" height="{{image.image_height}}"
+                   src="{{ url_for('browsing.protected', filename=image.file_path) }}">
+            </a>
+          </p>
+        </div> <!-- /.col -->
+      {%- endfor -%}
+    </div> <!-- /.row -->
+  {%- endfor %}
   {% endif %}
   </div>
 {% endblock %}
