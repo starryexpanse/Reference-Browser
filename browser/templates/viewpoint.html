@@ -23,6 +23,21 @@
   <table id="connections">
   </table>
 
+  {% if objects|length > 0 %}
+  <h2>Objects</h2>
+  <ol>
+    {% for object in objects %}
+      <li><a class="btn btn-default" href="{{ url_for('browsing.view_obj', obj_name=object.name) }}">
+        <img src="{{ url_for('browsing.static', filename='images/bg.png') }}"
+             data-src="{{ url_for('browsing.protected', filename=object.thumbnail) }}"
+             data-src-retina="{{ url_for('browsing.protected', filename=object.thumbnail2x) }}"
+             width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
+        {{ object.name }}
+      </a></li>
+    {% endfor %}
+   </ol>
+  {% endif %}
+
   {% if movie_count > 0 %}
   <h2>Movies ({{ movie_count }})</h2>
   <ol>

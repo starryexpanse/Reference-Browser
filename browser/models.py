@@ -86,6 +86,11 @@ class Viewpoint(db.Model):
                                  db.ForeignKey('viewpoints.viewpoint_id'),
                                  nullable=True)
 
+object_images = db.Table('object_images',
+  db.Column('object', db.Integer, db.ForeignKey('objects.object_id')),
+  db.Column('image', db.Integer, db.ForeignKey('rivenimgs.image_id'))
+)
+
 class RivenImage(db.Model):
   __tablename__ = 'rivenimgs'
   id = db.Column('image_id', db.Integer, primary_key = True)
@@ -109,3 +114,20 @@ class RivenMovie(db.Model):
   h264_path = db.Column(db.String(256))
   movie_width = db.Column(db.Integer)
   movie_height = db.Column(db.Integer)
+
+object_movies = db.Table('object_movies',
+  db.Column('object', db.Integer, db.ForeignKey('objects.object_id')),
+  db.Column('movie', db.Integer, db.ForeignKey('rivenmovs.movie_id'))
+)
+
+class Object(db.Model):
+  __tablename__ = 'objects'
+  id = db.Column('object_id', db.Integer, primary_key = True)
+  name = db.Column(db.String(100))
+  title = db.Column(db.String(100))
+  thumbnail = db.Column(db.String(256))
+  thumbnail2x = db.Column(db.String(256))
+  images = db.relationship('RivenImage', secondary=object_images,
+    backref=db.backref('objects', lazy='dynamic'))
+  movies = db.relationship('RivenMovie', secondary=object_movies,
+    backref=db.backref('objects', lazy='dynamic'))

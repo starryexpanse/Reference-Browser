@@ -19,6 +19,7 @@ from flask_wtf import FlaskForm
 from browser.models import (
   Globals,
   Island,
+  Object,
   Position,
   RivenImage,
   RivenMovie,
@@ -198,6 +199,10 @@ def viewpoint(symbol, vpt_name):
     next_vpt = next_vpt.name
 
   vpt_matrix = CreateViewpointMatrix(viewpoint)
+  objects = set()
+  for image in img_query:
+    for object in image.objects:
+      objects.add(object)
 
   return render_template('viewpoint.html',
       images=img_query,
@@ -211,7 +216,25 @@ def viewpoint(symbol, vpt_name):
       next_vpt=next_vpt,
       thumbnail_width=g.thumbnail_width,
       thumbnail_height=g.thumbnail_height,
-      vpt_matrix=json.dumps(vpt_matrix))
+      objects=objects)
+
+@browsing.route('/objects', strict_slashes=False)
+@login_required
+def objects():
+  g = Globals.query.filter(Globals.global_id == 1).first()
+  return render_template('objects.html',
+    thumbnail_width=g.thumbnail_width,
+    thumbnail_height=g.thumbnail_height,
+    objects=Object.query.all())
+
+@browsing.route('/objects/<obj_name>')
+@login_required
+def view_obj(obj_name):
+  obj = Object.query.filter(Object.name == obj_name).first()
+  if not obj:
+    return 'There is no "%s" object.' % obj_name
+  return render_template('object.html',
+    object=obj)
 
 @browsing.route('/viewpoints')
 @login_required

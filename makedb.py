@@ -4,7 +4,7 @@ from file_finder import FileFinder, FileInfo
 from concurrent.futures import ThreadPoolExecutor
 from graphviz import Digraph
 from PIL import Image
-import json
+import json5
 import multiprocessing
 import os
 import shutil
@@ -17,6 +17,9 @@ NumImagePixels = 238336
 StandardImageSize = [608, 392]
 
 class InvalidPathException(Exception):
+  pass
+
+class InvalidReferenceException(Exception):
   pass
 
 class Globals(object):
@@ -174,6 +177,93 @@ class Position(object):
       self.viewpoints[viewpoint_name].AddGraphVizData(position_graph)
     island_graph.subgraph(position_graph)
 
+class Object(object):
+  next_id = 1
+
+  def __init__(self, name, title):
+    self.id = Object.next_id
+    Object.next_id += 1
+    self.name = name
+    self.title = title
+    self.thumbnail = 'missing.png'
+    self.thumbnail2x = 'missing.png'
+    self.images = []
+    self.movies = []
+
+  def sqlrow(self):
+    return [self.id, self.name, self.title, self.thumbnail, self.thumbnail2x]
+
+  @staticmethod
+  def insert():
+    return '(?,?,?,?,?)'
+
+  @staticmethod
+  def CreateTable(conn):
+    c = conn.cursor()
+    c.execute('''CREATE TABLE objects
+              (object_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
+              title TEXT,
+              thumbnail TEXT,
+              thumbnail2x TEXT)''')
+    conn.commit()
+
+class ObjectImageAssocation(object):
+  def __init__(self, obj, img):
+    self.obj = obj
+    self.img = img
+
+  def sqlrow(self):
+    return [self.obj.id, self.img.id]
+
+  @staticmethod
+  def insert():
+    return '(?,?)'
+
+  @staticmethod
+  def CreateTable(conn):
+    c = conn.cursor()
+    c.execute('''CREATE TABLE object_images
+              (object INTEGER,
+              image INTEGER,
+              FOREIGN KEY(object) REFERENCES objects(object_id),
+              FOREIGN KEY(image) REFERENCES rivenimgs(image_id))''')
+    conn.commit()
+
+  @staticmethod
+  def InsertAll(cursor, items):
+    cursor.executemany('INSERT INTO object_images VALUES %s' % \
+        ObjectImageAssocation.insert(),
+        [i.sqlrow() for i in items])
+
+class ObjectMovieAssocation(object):
+  def __init__(self, obj, movie):
+    self.obj = obj
+    self.movie = movie
+
+  def sqlrow(self):
+    return [self.obj.id, self.movie.id]
+
+  @staticmethod
+  def insert():
+    return '(?,?)'
+
+  @staticmethod
+  def CreateTable(conn):
+    c = conn.cursor()
+    c.execute('''CREATE TABLE object_movies
+              (object INTEGER,
+              movie INTEGER,
+              FOREIGN KEY(object) REFERENCES objects(object_id),
+              FOREIGN KEY(movie) REFERENCES rivenmovs(movie_id))''')
+    conn.commit()
+
+  @staticmethod
+  def InsertAll(cursor, items):
+    cursor.executemany('INSERT INTO object_movies VALUES %s' % \
+        ObjectMovieAssocation.insert(),
+        [i.sqlrow() for i in items])
+
 class Viewpoint(object):
   next_id = 1
 
@@ -273,6 +363,10 @@ class RivenImg(object):
     self.file_path = file_path
     self.image_width = image_width
     self.image_height = image_height
+
+  def IsFullSize(self):
+    return self.image_width == StandardImageSize[0] and \
+           self.image_height == StandardImageSize[1]
 
   def sqlrow(self):
     return [self.id, self.viewpoint.id, self.filename, self.friendly,
@@ -382,6 +476,9 @@ class Loader(object):
     Viewpoint.CreateTable(conn)
     RivenImg.CreateTable(conn)
     RivenMovie.CreateTable(conn)
+    Object.CreateTable(conn)
+    ObjectImageAssocation.CreateTable(conn)
+    ObjectMovieAssocation.CreateTable(conn)
 
     g = Globals()
     c.executemany('INSERT INTO globals VALUES %s' % Globals.insert(),
@@ -393,7 +490,7 @@ class Loader(object):
   def ParseIslandViewpoint(current_island, viewpoint_name):
     items = viewpoint_name.split(',')
     if len(items) > 1:
-      print("Don't currently support multiple forward links")
+      print("WARN: Don't currently support multiple forward links")
       viewpoint_name = items[0]
     items = viewpoint_name.split('/')
     if len(items) == 2:
@@ -409,7 +506,7 @@ class Loader(object):
     vpt_count = 0
     viewpoint_references = [] # (Viewpoint, island_symbol, pos, viewpoint_name)
     with open(os.path.join(fname)) as data_file:
-      json_islands = json.load(data_file)
+      json_islands = json5.load(data_file)
       for json_island in json_islands:
         island_symbol = json_island['symbol']
         island = Island(island_symbol)
@@ -669,6 +766,88 @@ class Loader(object):
       for f in futures:
         f.result()
 
+  @staticmethod
+  def FindViewpointImage(viewpoint, all_images, image_name):
+    for image in all_images:
+      if image.viewpoint != viewpoint:
+        continue
+      if image.friendly == image_name:
+        return image
+    return None
+
+  @staticmethod
+  def FindViewpointMovie(viewpoint, all_movies, movie_name):
+    for movie in all_movies:
+      if movie.viewpoint != viewpoint:
+        continue
+      if movie.friendly == movie_name:
+        return movie
+    return None
+
+  @staticmethod
+  def FindAssets(ref, riven_map, all_images, all_movies):
+    """Parse an image reference to a list of images.
+
+    A reference in the form of <island_symbol>/<viewpoint_name>, find all full
+    size images in that viewpoint and return them."""
+    items = ref.split('/')
+    if len(items) < 2:
+      raise InvalidReferenceException(ref)
+
+    if items[0] not in riven_map.islands:
+      raise InvalidReferenceException(ref)
+    island = riven_map.islands[items[0]]
+
+    if items[1] not in island.viewpoints:
+      raise InvalidReferenceException(ref)
+    viewpoint = island.viewpoints[items[1]]
+
+    images = []
+    movies = []
+
+    if len(items) == 3:
+      # Only add the specified image
+      image = Loader.FindViewpointImage(viewpoint, all_images, items[2])
+      if image:
+        images.append(image)
+      else:
+        movie = Loader.FindViewpointMovie(viewpoint, all_movies, items[2])
+        if not movie:
+          raise InvalidReferenceException(ref)
+        movies.append(movie)
+    else:
+      # Add all full sized images in the given viewpoint.
+      for image in all_images:
+        if image.viewpoint == viewpoint and image.IsFullSize():
+          images.append(image)
+      # Don't load all viewpoint movies. There are too many small movies that
+      # clutter the object page.
+    return (images, movies)
+
+  def LoadObjects(self, riven_map, all_images, all_movies):
+    obj_names = set()
+    objects = []
+    with open(os.path.join('objects.json5')) as f:
+      json_objects = json5.load(f)
+      for json_object in json_objects:
+        name = json_object['name']
+        if name in obj_names:
+          print('Duplicate object name: "%s"' % name)
+          sys.exit(1)
+        obj_names.add(name)
+        obj = Object(name, json_object['title'])
+        for json_ref in json_object['refs']:
+          obj_images, obj_movies = Loader.FindAssets(json_ref, riven_map,
+                                                     all_images, all_movies)
+          obj.images.extend(obj_images)
+          obj.movies.extend(obj_movies)
+        if len(obj.images):
+          viewpoint = obj.images[0].viewpoint
+          obj.thumbnail = viewpoint.thumbnail
+          obj.thumbnail2x = viewpoint.thumbnail2x
+        objects.append(obj)
+    return objects
+
   def LoadData(self, conn):
     """Create the rest of the Riven map based on the image/movie data."""
     island_to_imgvpt = self.LoadFiles('png')
@@ -744,6 +923,9 @@ class Loader(object):
       for f in futures:
         f.result()
 
+    # Need thumbnails to be finished.
+    all_objects = self.LoadObjects(riven, images, movies)
+
     riven.WriteGraphViz('riven.dot')
 
     c.executemany('INSERT INTO islands VALUES %s' % Island.insert(),
@@ -756,8 +938,19 @@ class Loader(object):
                   [i.sqlrow() for i in images])
     c.executemany('INSERT INTO rivenmovs VALUES %s' % RivenMovie.insert(),
                   [m.sqlrow() for m in movies])
-    conn.commit()
+    c.executemany('INSERT INTO objects VALUES %s' % Object.insert(),
+                  [o.sqlrow() for o in all_objects])
+    obj_to_img = []
+    obj_to_mov = []
+    for obj in all_objects:
+      for img in obj.images:
+        obj_to_img.append(ObjectImageAssocation(obj, img))
+      for movie in obj.movies:
+        obj_to_mov.append(ObjectMovieAssocation(obj, movie))
+    ObjectImageAssocation.InsertAll(c, obj_to_img)
+    ObjectMovieAssocation.InsertAll(c, obj_to_mov)
 
+    conn.commit()
 
   def CreateDB(self):
     try:
@@ -803,7 +996,7 @@ class Loader(object):
   @staticmethod
   def ExtractGameImagesForWebsite():
     with open('extraction_data.json') as data_file:
-      data = json.load(data_file)
+      data = json5.load(data_file)
       for image in data:
         d = os.path.dirname(image['outfile'])
         if not os.path.exists(d):

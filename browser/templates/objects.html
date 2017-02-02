@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+  <h1>All Objects</h1>
+
+  {% for object in objects %}
+    <a class="btn btn-default" href="{{ url_for('browsing.view_obj', obj_name=object.name) }}">
+      <img src="{{ url_for('browsing.static', filename='images/bg.png') }}"
+           data-src="{{ url_for('browsing.protected', filename=object.thumbnail) }}"
+           data-src-retina="{{ url_for('browsing.protected', filename=object.thumbnail2x) }}"
+           width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
+      {{ object.name }}
+    </a>
+  {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+
+  <script src="{{ url_for('browsing.static', filename='js/jquery.unveil.js') }}"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("img").unveil();
+    });
+  </script>
+{% endblock %}

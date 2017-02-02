@@ -1,0 +1,189 @@
+[
+  {
+    name: 'golden-dome',
+    title: 'Golden Dome',
+    // Viewpoints/Views in which this object is visible.
+    refs: [
+      'T/75/ext.1550_s2',
+      'T/77/ext.1450_s2',
+      'T/132',
+      'T/133',
+      'T/146/tlscp5pos300luhi',
+      'T/155/tlscp5pos475luhi',
+      'T/156',
+      'T/400/islandexteriorlu.5050',
+      'T/401',
+      'T/422',
+      'T/424',
+      'B/83/craterridge.2550',
+      'B/85',
+      'B/87',
+      'B/90',
+      'B/93',
+      'B/96',
+      'B/99',
+      'B/102',
+      'B/105/bridge.1100_s1',
+      'B/107',
+      'B/211',
+      'B/217',
+      'B/225',
+      'B/230/ookdepot.850',
+      'B/232/ookdepot.975',
+      'B/237/ookdepot.1075',
+      'B/243/ookdepot.1100',
+    ]
+  }, {
+    name: 'first-stairs',
+    title: 'First Stairs',
+    refs: [
+      'T/112',
+      'T/113',
+      'T/115',
+      'T/116',
+      'T/118',
+      'T/119',
+      'T/123',
+      'T/125',
+      'T/131',
+      'T/134',
+    ]
+  }, {
+    name: 'first-bridge',
+    title: 'First Bridge',
+    refs: [
+      'T/2',
+      'T/75',
+      'T/77',
+      'T/80',
+      'T/90',
+      'T/91',
+      'T/92',
+      'T/95',
+      'T/96',
+      'T/98',
+      'T/99',
+      'T/101',
+      'T/102',
+      'T/106',
+      'T/114',
+      'T/117',
+      'T/123',
+      'T/131',
+    ]
+  }, {
+    name: 'temple-gate',
+    title: 'Temple Gate',
+    refs: [
+      'T/107/islandexterior.1950',
+      'T/107/otdoor',
+      'T/108',
+      'T/248',
+      'T/252',
+      'T/253',
+    ]
+  }, {
+    name: 't-maglev-dock',
+    title: 'T-maglev-dock',
+    refs: [
+      'T/38',
+      'T/41',
+      'T/41',
+      'T/43',
+      'T/45',
+      'T/46',
+      'T/48',
+      'T/49',
+      'T/50',
+      'T/51',
+      'T/53',
+      'T/54', // Movie
+      'T/55',
+      'T/56',
+      'T/57',
+      'T/59',
+      'T/60',
+      'T/62',
+    ]
+  }, {
+    name: 'throne',
+    title: 'Throne',
+    refs: [
+      'T/8',
+      'T/9',
+      'T/11/imgbrsu',
+      'T/11/imagerm.1002',
+      'T/13',
+      'T/15/dd_mg_1',
+      'T/15/dunmgb2',
+    ]
+  }, {
+    name: 'prison-walkway',
+    title: 'Prison Walkway',
+    refs: [
+      'P/1',
+      'P/3',
+      'P/5',
+      'P/7',
+      'P/9',
+      'P/12',
+      'P/19',
+      'P/23',
+      'P/33',
+      'P/34',
+      'P/35',
+      'P/36',
+      'P/38',
+      'P/39',
+    ]
+  }, {
+    name: 'prison-entrance',
+    title: 'Prison Entrance',
+    refs: [
+      'P/15',
+      'P/16',
+      'P/18',
+      'P/20',
+      'P/22',
+      'P/24',
+      'P/25',
+      'P/27',
+      'P/28',
+      'P/37',
+    ]
+  }, {
+    name: "gehns-lab-ext",
+    title: "Gehn's Lab (exterior)",
+    refs: [
+      'B/71',
+      'B/79',
+      'B/155',
+      'B/199',
+      'B/203',
+      'B/206',
+      'B/215',
+      'B/219',
+      'B/226',
+      'B/239',
+      'B/240',
+    ]
+  }, {
+    name: "axe",
+    title: "Axe",
+    refs: [
+      'J/46',
+      'J/44',
+      'J/22',
+      'J/29',
+    ]
+  }, {
+    name: "beetle",
+    title: "Beetle",
+    refs: [
+      'J/52/clearcutbtlup.1090', // non fullscreen image.
+      'J/52/beetle', // Movie
+      'J/52/btlefly', // Movie
+      'J/52/clearcutareabtl.1090',
+    ]
+  },
+]
