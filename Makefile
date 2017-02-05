@@ -10,7 +10,7 @@ cleanpositionthumbs:
 .PHONY: cleanthumbs
 cleanthumbs: cleanpositionthumbs
 	find $(app_dir) -name '*thumbnail*.png' | xargs rm
-	rm -rf $(app_dir)/protected/images
+	rm -rf -- "$(app_dir)/protected/images"
 
 .PHONY: cleangifs
 cleangifs:
