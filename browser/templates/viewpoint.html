@@ -19,9 +19,11 @@
     </a>
   </p>
 
+  {% if num_adjacent > 1 %}
   <h2>Adjacent Viewpoints</h2>
   <table id="connections">
   </table>
+  {% endif %}
 
   {% if objects|length > 0 %}
   <h2>Objects</h2>
@@ -100,7 +102,9 @@
       }
     }
     $(document).ready(function() {
-      loadTable( {{ vpt_matrix|safe }});
+      {% if num_adjacent > 0 %}
+        loadTable( {{ vpt_matrix|safe }});
+      {% endif %}
       $("img").unveil();
     });
   </script>

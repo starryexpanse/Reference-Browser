@@ -203,6 +203,11 @@ def viewpoint(symbol, vpt_name):
   for image in img_query:
     for object in image.objects:
       objects.add(object)
+  num_adjacent = 0;
+  for row in vpt_matrix:
+    for cell in row:
+      if cell:
+        num_adjacent += 1
 
   return render_template('viewpoint.html',
       images=img_query,
@@ -216,7 +221,9 @@ def viewpoint(symbol, vpt_name):
       next_vpt=next_vpt,
       thumbnail_width=g.thumbnail_width,
       thumbnail_height=g.thumbnail_height,
-      objects=objects)
+      objects=objects,
+      vpt_matrix=json.dumps(vpt_matrix),
+      num_adjacent=num_adjacent)
 
 @browsing.route('/objects', strict_slashes=False)
 @login_required
