@@ -5,10 +5,10 @@ def create_app():
   app.config.from_pyfile('config.py')
   app.config.from_pyfile('instance/config.py')
 
-  from browser.models import db, test_password
+  from browser.models import db, SetTestPassword
   db.init_app(app)
   with open('instance/password.txt', 'r') as f:
-    test_password = f.readline()
+    SetTestPassword(f.readline().strip())
 
   from browser.views import browsing, login_manager
   app.register_blueprint(browsing)

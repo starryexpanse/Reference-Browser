@@ -4,6 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 test_password = None
 
+def SetTestPassword(pwd):
+  global test_password
+  test_password = pwd
+
 class Globals(db.Model, UserMixin):
   __tablename__ = 'globals'
   global_id = db.Column('global_id', db.Integer, primary_key = True)
@@ -25,8 +29,8 @@ class User(db.Model, UserMixin):
     return self.id
 
   def check_password(self, password):
-    return True
-    #return password == test_password
+    global test_password
+    return password == test_password
 
 class Island(db.Model):
   __tablename__ = 'islands'
