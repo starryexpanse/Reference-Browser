@@ -278,16 +278,6 @@ def view(symbol, vpt_name, view_name):
       vpt_title='%s/%s' % (island.symbol, viewpoint.name),
       island_symbol=island.symbol)
 
-@browsing.route('/viewpoints')
-@login_required
-def viewpoints():
-  return render_template('viewpoints.html', viewpoints=Viewpoint.query.all())
-
-@browsing.route('/images')
-@login_required
-def images():
-  return render_template('images.html', images=RivenImage.query.all())
-
 @browsing.route('/protected/<path:filename>')
 @login_required
 def protected(filename):
