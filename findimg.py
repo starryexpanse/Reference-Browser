@@ -139,7 +139,7 @@ if __name__ == '__main__':
   except:
     pass
   ImageMatcher.TrimScreenshot(options.image, tmp_name)
-  matcher = ImageMatcher(os.path.join('protected', 'DVD'),
+  matcher = ImageMatcher(os.path.join('browser', 'protected', 'DVD'),
                          options.island_symbol)
   matcher.FindMatches(tmp_name)
   try:

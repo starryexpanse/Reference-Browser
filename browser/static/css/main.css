@@ -17,7 +17,7 @@
 
 .page-header {
   margin: 0 0 20px;
-  background-image: url("../../protected/images/header.png");
+  background-image: url("../../../protected/images/header.png");
   background-size: cover;
   background-position: right 0px bottom 40px;
   padding: 10px;

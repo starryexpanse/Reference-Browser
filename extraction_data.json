@@ -1,52 +1,52 @@
 [
   {
-    "infile":"protected/DVD/g_Data-MHK/175_adome.50.png",
-    "outfile":"protected/images/all_icon.png",
+    "infile":"browser/protected/DVD/g_Data-MHK/175_adome.50.png",
+    "outfile":"browser/protected/images/all_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/g_Data-MHK/60_gplateau.100.png",
-    "outfile":"protected/images/garden_icon.png",
+    "infile":"browser/protected/DVD/g_Data-MHK/60_gplateau.100.png",
+    "outfile":"browser/protected/images/garden_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/t_Data1-MHK/159_tintroshot.bg.png",
-    "outfile":"protected/images/kveer_icon.png",
+    "infile":"browser/protected/DVD/t_Data1-MHK/159_tintroshot.bg.png",
+    "outfile":"browser/protected/images/kveer_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/p_Data-MHK/5_pisland.200.png",
-    "outfile":"protected/images/prison_icon.png",
+    "infile":"browser/protected/DVD/p_Data-MHK/5_pisland.200.png",
+    "outfile":"browser/protected/images/prison_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/t_Data1-MHK/178_tgr_s1.4.png",
-    "outfile":"protected/images/temple_icon.png",
+    "infile":"browser/protected/DVD/t_Data1-MHK/178_tgr_s1.4.png",
+    "outfile":"browser/protected/images/temple_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/b_Data-MHK/410_bislandcratervntarm.975.png",
-    "outfile":"protected/images/boiler_icon.png",
+    "infile":"browser/protected/DVD/b_Data-MHK/410_bislandcratervntarm.975.png",
+    "outfile":"browser/protected/images/boiler_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/j_Data1-MHK/15_jclearcut.700.png",
-    "outfile":"protected/images/jungle_icon.png",
+    "infile":"browser/protected/DVD/j_Data1-MHK/15_jclearcut.700.png",
+    "outfile":"browser/protected/images/jungle_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/o_Data-MHK/1_oofficecagedown.1.png",
-    "outfile":"protected/images/233_icon.png",
+    "infile":"browser/protected/DVD/o_Data-MHK/1_oofficecagedown.1.png",
+    "outfile":"browser/protected/images/233_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/r_Data-MHK/3_rrebelentranceroom.0.png",
-    "outfile":"protected/images/rebel_icon.png",
+    "infile":"browser/protected/DVD/r_Data-MHK/3_rrebelentranceroom.0.png",
+    "outfile":"browser/protected/images/rebel_icon.png",
     "scale": 0.21
   },
   {
-    "infile":"protected/DVD/r_Data-MHK/3_rrebelentranceroom.0.png",
-    "outfile":"protected/images/header.png",
+    "infile":"browser/protected/DVD/r_Data-MHK/3_rrebelentranceroom.0.png",
+    "outfile":"browser/protected/images/header.png",
     "scale": 1.0
   }
 ]

@@ -30,7 +30,7 @@ For creating the database:
 
 # Creating the database.
 
-1. Put the extracted game data in the protected/DVD folder.
+1. Put the extracted game data in the browser/protected/DVD folder.
 2. Run `make`. If you don't have make installed then `./makedb.py`
    or `python3 makedb.py`.
 
@@ -49,18 +49,22 @@ For development purposes run it as so:
 
     python app.py
 
-### Browser Configuration File
+### Browser Configuration Files
 
-The browser will load a configuration file to read app settings.
-This file is named "config.json".
+The browser reads its configuration information from two places.
 
-    {
-      "secret": "<random characters>",
-      "db_url": "sqlite:////path/to/database/riven.sqlite",
-      "test_pwd": "HardCodedPassword (temp for development)",
-      "host": "0.0.0.0 - or IP",
-      "debug": "true/false"
-    }
+#### App configuration
+
+The browser first reads it's configuration data from `config.py`. This configuration
+is then overridden by `browser/config.py`. The first file is under revision control
+the second is not. At a minimum set these two keys:
+
+1. `SQLALCHEMY_DATABASE_URI`
+2. `SECRET_KEY`
+
+For more information see [Flask Configuration](http://flask.pocoo.org/docs/0.12/config/).
+
+The single test password is written from `instance.password.txt`.
 
 **Note**: This application does not currently support multiple users, and
 the one hard-coded user "admin" has a hard-coded test password specified above.
