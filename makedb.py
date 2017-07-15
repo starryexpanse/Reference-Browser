@@ -563,7 +563,7 @@ class Loader(object):
 
   @staticmethod
   def MakeH264(mov, outpath):
-    cmd = ['ffmpeg', '-loglevel', 'error', '-y', '-i', mov, '-an', '-b', '200k',
+    cmd = ['ffmpeg', '-loglevel', 'error', '-y', '-i', mov, '-b', '200k',
             '-bt', '240k', '-vcodec', 'libx264', '-crf', '23', outpath]
     print(' '.join(cmd))
     subprocess.check_call(cmd)
