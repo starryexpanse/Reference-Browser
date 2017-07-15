@@ -42,7 +42,9 @@ the movie transcoding process is CPU intensive. When finished the
 database ("riven.sqlite") will exist as well as many new images
 in the protected folder. To delete these newly created images just:
 
-    make cleanall
+```bash
+make cleanall
+```
 
 # Running the Web Application.
 
@@ -68,4 +70,20 @@ the one hard-coded user "admin" has a hard-coded test password specified above.
 
 For development purposes, the app can be run as so:
 
-    python app.py
+```bash
+make run
+```
+
+If you don't have make installed then:
+
+```bash
+python app.py
+```
+
+# Deploying to the server.
+
+```bash
+make deploy
+ssh <server>
+sudo apachectl restart
+```

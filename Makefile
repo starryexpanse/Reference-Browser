@@ -29,3 +29,11 @@ cleanall: clean cleangifs cleanmovies
 .PHONY: makedb
 makedb:
 	./makedb.py
+
+.PHONY: run
+run:
+	python app.py
+
+.PHONY: deploy
+deploy:
+	./deploy.sh
