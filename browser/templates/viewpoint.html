@@ -46,7 +46,7 @@
     <div class="row">
       {%- for movie in column -%}
         <div class="col-sm-6">
-          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=movie.friendly) }}">{{ movie.friendly }}</a></br>
+          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=movie.friendly) }}">$RIVENREF{{ movie.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Movies") }}</a></br>
           <video class="img img-responsive"
                  width="{{movie.movie_width}}" height="{{movie.movie_height}}"
                  src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
@@ -64,7 +64,7 @@
     <div class="row">
       {%- for image in column -%}
         <div class="col-sm-6">
-          <p>{{ image.friendly }}</br>
+          <p>$RIVENREF/{{ image.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Images") }}</br>
             <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=image.friendly) }}">
               <img class="img-responsive"
                    width="{{image.image_width}}" height="{{image.image_height}}"
