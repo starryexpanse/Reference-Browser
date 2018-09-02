@@ -46,11 +46,21 @@
     <div class="row">
       {%- for movie in column -%}
         <div class="col-sm-6">
-          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=movie.friendly) }}">$RIVENREF{{ movie.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Movies") }}</a></br>
+          <div class="input-group">
+            <input type="text" readonly class="form-control filepath"
+                  aria-describedby="basic-addon2" readonly
+                  value="$RIVENREF{{ movie.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Videos") }}"
+                  id="{{ movie.friendly }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default glyphicon glyphicon-copy" type="button"
+                onclick="copyToClipboard('{{ movie.friendly }}')"></button>
+            </span>
+          </div>
           <video class="img img-responsive"
                  width="{{movie.movie_width}}" height="{{movie.movie_height}}"
                  src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
                  loop controls><p>don't support video</p></vid>
+          </br>
         </div> <!-- /.col -->
       {%- endfor -%}
     </div> <!-- /.row -->
@@ -64,13 +74,22 @@
     <div class="row">
       {%- for image in column -%}
         <div class="col-sm-6">
-          <p>$RIVENREF/{{ image.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Images") }}</br>
-            <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=image.friendly) }}">
-              <img class="img-responsive"
-                   width="{{image.image_width}}" height="{{image.image_height}}"
-                   src="{{ url_for('browsing.protected', filename=image.file_path) }}">
-            </a>
-          </p>
+          <div class="input-group">
+            <input type="text" readonly class="form-control filepath"
+                  aria-describedby="basic-addon2" readonly
+                  value="$RIVENREF/{{ image.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Images") }}"
+                  id="{{ image.friendly }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default glyphicon glyphicon-copy" type="button"
+                onclick="copyToClipboard('{{ image.friendly }}')"></button>
+            </span>
+          </div>
+          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=image.friendly) }}">
+            <img class="img-responsive"
+                 width="{{image.image_width}}" height="{{image.image_height}}"
+                 src="{{ url_for('browsing.protected', filename=image.file_path) }}">
+          </a>
+          </br>
         </div> <!-- /.col -->
       {%- endfor -%}
     </div> <!-- /.row -->
