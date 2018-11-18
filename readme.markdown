@@ -8,18 +8,21 @@ extract the game assets.
 
 # Prerequisites
 
-For hosting the reference browser:
+## Web app prerequisites
 
+For hosting the reference browser, you will need both Python 2 and Python 3 dependencies. This is because the program to make the database (makedb.py) is written in Python3, but the web application is written in Python2.
+
+    # python 2 dependencies:
     pip install flask
     pip install flask-sqlalchemy
     pip install flask-login
     pip install flask-wtf
+    
+    # python 3 dependencies:
     pip3 install Pillow
     pip3 install graphviz
 
-**Note**: The program to make the database (makedb.py) is written in Python3, but the
-web application is written in Python2 - you will need to install the first two Python
-packages into both Pythons (i.e. pip and pip3).
+## Database prerequisites
 
 For creating the database:
 
@@ -43,28 +46,26 @@ in the protected folder. To delete these newly created images just:
 
 # Running the Web Application.
 
-First set the configuration options (see below).
+#### Step 1: App configuration
 
-For development purposes run it as so:
+The reference browser first reads it's configuration data from `config.py`. This
+configuration is then overridden by `instance/config.py`. Since `instance/config.py`
+is not under version control, it should be the one that you update.
 
-    python app.py
-
-### Browser Configuration Files
-
-The browser reads its configuration information from two places.
-
-#### App configuration
-
-The browser first reads it's configuration data from `config.py`. This configuration
-is then overridden by `browser/config.py`. The first file is under revision control
-the second is not. At a minimum set these two keys:
+The following keys must be specified:
 
 1. `SQLALCHEMY_DATABASE_URI`
 2. `SECRET_KEY`
 
 For more information see [Flask Configuration](http://flask.pocoo.org/docs/0.12/config/).
 
-The single test password is written from `instance.password.txt`.
+One password is used for authentication, and it is read from `instance/password.txt`.
 
 **Note**: This application does not currently support multiple users, and
 the one hard-coded user "admin" has a hard-coded test password specified above.
+
+#### Step 2: Running Flask for development
+
+For development purposes, the app can be run as so:
+
+    python app.py
