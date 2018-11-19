@@ -54,8 +54,8 @@ is not under version control, it should be the one that you update.
 
 The following keys must be specified:
 
-1. `SQLALCHEMY_DATABASE_URI`
-2. `SECRET_KEY`
+1. `SQLALCHEMY_DATABASE_URI` (path should follow the form `sqlite:////absolute/path/to/riven.sqlite`. Note the four [4] slashes in the scheme specifier.)
+2. `SECRET_KEY` (may be any string, but a cryptographically random value is recommended for deployment)
 
 For more information see [Flask Configuration](http://flask.pocoo.org/docs/0.12/config/).
 
