@@ -1,7 +1,7 @@
 app_dir='browser'
 
 .PHONY: default
-default: makedb
+default: db
 
 .PHONY: cleanpositionthumbs
 cleanpositionthumbs:
@@ -26,8 +26,8 @@ clean: cleanthumbs
 .PHONY: cleanall
 cleanall: clean cleangifs cleanmovies
 
-.PHONY: makedb
-makedb:
+.PHONY: db
+db:
 	./makedb.py
 
 .PHONY: run
