@@ -12,3 +12,7 @@ lib/
 *.DS_Store
 __pycache__
 out.txt
+
+browser/protected/
+riven.sqlite
+instance/

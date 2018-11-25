@@ -1,0 +1,18 @@
+{% for column in islands | batch(2) -%}
+  <div class="row">
+    {%- for island in column -%}
+      <div class="col-sm-6">
+        <a class="btn btn-default navbar-btn btn-wrap" href="{{ url_for('browsing.island', symbol=island.symbol) }}">
+          <table>
+            <tr>
+              <td>
+                <img class="img img-thumbnail" src="{{ url_for('browsing.protected', filename=island.icon) }}">
+              </td>
+              <td>{{ island.title() }}</td>
+            </tr>
+          </table>
+        </a>
+      </div> <!-- /.col -->
+    {%- endfor -%}
+  </div> <!-- /.row -->
+{%- endfor %}
