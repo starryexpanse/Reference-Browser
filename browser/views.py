@@ -103,11 +103,6 @@ def login():
     return redirect(next or url_for('browsing.islands'))
   return render_template('login.html', form=form)
 
-@browsing.route("/tags/manage")
-@login_required
-def manage_tags():
-  return render_template('manage_tags.html')
-
 @browsing.route("/logout")
 @login_required
 def logout():
