@@ -77,7 +77,9 @@ class LoginForm(FlaskForm):
 @login_required
 def islands():
   query = Island.query.order_by(Island.symbol).all()
-  return render_template('islands.html', islands=query)
+  return render_template('islands.html',
+    islands=query,
+    title='')
 
 @browsing.route('/login', methods=['GET', 'POST'])
 def login():
@@ -127,6 +129,7 @@ def island(symbol):
       use_unveil=True,
       position_count=pos_query.count(),
       viewpoint_count=vpt_query.count(),
+      title=island.title(),
       thumbnail_width=g.thumbnail_width,
       thumbnail_height=g.thumbnail_height,
       thumbnail2x_width=g.thumbnail2x_width,
