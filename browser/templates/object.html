@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h1>Object: {{ object.title }}</h1>
+
+{% for column in object.movies | batch(2) -%}
+  <div class="row">
+    {%- for movie in column -%}
+      <div class="col-sm-6">
+        <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
+        <video class="img img-responsive"
+               width="{{movie.movie_width}}" height="{{movie.movie_height}}"
+               src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
+               loop controls><p>don't support video</p></video>
+      </div> <!-- /.col -->
+    {%- endfor -%}
+  </div> <!-- /.row -->
+{%- endfor %}
+
+{% for column in object.images | batch(2) -%}
+  <div class="row">
+    {%- for image in column -%}
+      <div class="col-sm-6">
+        <p>{{ image.friendly }}</br>
+          <img class="img-responsive"
+               width="{{image.image_width}}" height="{{image.image_height}}"
+               src="{{ url_for('browsing.protected', filename=image.file_path) }}">
+        </p>
+      </div> <!-- /.col -->
+    {%- endfor -%}
+  </div> <!-- /.row -->
+{%- endfor %}
+{% endblock %}

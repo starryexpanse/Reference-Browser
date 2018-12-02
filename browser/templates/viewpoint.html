@@ -19,36 +19,81 @@
     </a>
   </p>
 
+  {% if num_adjacent > 1 %}
   <h2>Adjacent Viewpoints</h2>
   <table id="connections">
   </table>
+  {% endif %}
+
+  {% if objects|length > 0 %}
+  <h2>Objects</h2>
+  <ol>
+    {% for object in objects %}
+      <li><a class="btn btn-default" href="{{ url_for('browsing.view_obj', obj_name=object.name) }}">
+        <img src="{{ url_for('browsing.static', filename='images/bg.png') }}"
+             data-src="{{ url_for('browsing.protected', filename=object.thumbnail) }}"
+             data-src-retina="{{ url_for('browsing.protected', filename=object.thumbnail2x) }}"
+             width="{{thumbnail_width}}" height="{{thumbnail_height}}"><br>
+        {{ object.name }}
+      </a></li>
+    {% endfor %}
+   </ol>
+  {% endif %}
 
   {% if movie_count > 0 %}
   <h2>Movies ({{ movie_count }})</h2>
-  <ol>
-    {% for movie in movies %}
-      <li>
-        <a href="/{{ movie.file_path }}">{{ movie.friendly }}</a></br>
-        <video class="img img-responsive"
-                width="{{movie.movie_width}}" height="{{movie.movie_height}}"
-                src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
-                loop controls><p>don't support video</p></vid>
-      </li>
-    {% endfor %}
-  </ol>
+  {% for column in movies | batch(2) -%}
+    <div class="row">
+      {%- for movie in column -%}
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input type="text" readonly class="form-control filepath"
+                  aria-describedby="basic-addon2" readonly
+                  value="$RIVENREF{{ movie.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Videos") }}"
+                  id="{{ movie.friendly }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default glyphicon glyphicon-copy" type="button"
+                onclick="copyToClipboard('{{ movie.friendly }}')"></button>
+            </span>
+          </div>
+          <video class="img img-responsive"
+                 width="{{movie.movie_width}}" height="{{movie.movie_height}}"
+                 src="{{ url_for('browsing.protected', filename=movie.h264_path) }}"
+                 loop controls><p>don't support video</p></vid>
+          </br>
+        </div> <!-- /.col -->
+      {%- endfor -%}
+    </div> <!-- /.row -->
+  {%- endfor %}
   {% endif %}
 
   {% if image_count > 0 %}
   <h2>Images ({{image_count}})</h2>
-  <ol>
-  {% for image in images %}
-      <li>{{ image.friendly }}</br>
-        <img class="img-responsive"
-              width="{{image.image_width}}" height="{{image.image_height}}"
-              src="{{ url_for('browsing.protected', filename=image.file_path) }}">
-      </li>
-  {% endfor %}
-  </ol>
+
+  {% for column in images | batch(2) -%}
+    <div class="row">
+      {%- for image in column -%}
+        <div class="col-sm-6">
+          <div class="input-group">
+            <input type="text" readonly class="form-control filepath"
+                  aria-describedby="basic-addon2" readonly
+                  value="$RIVENREF/{{ image.file_path | replace("browser/protected", "") | replace("DVD", "DVD/Images") }}"
+                  id="{{ image.friendly }}">
+            <span class="input-group-btn">
+              <button class="btn btn-default glyphicon glyphicon-copy" type="button"
+                onclick="copyToClipboard('{{ image.friendly }}')"></button>
+            </span>
+          </div>
+          <a href="{{ url_for('browsing.view', symbol=island_symbol, vpt_name=vpt_name, view_name=image.friendly) }}">
+            <img class="img-responsive"
+                 width="{{image.image_width}}" height="{{image.image_height}}"
+                 src="{{ url_for('browsing.protected', filename=image.file_path) }}">
+          </a>
+          </br>
+        </div> <!-- /.col -->
+      {%- endfor -%}
+    </div> <!-- /.row -->
+  {%- endfor %}
   {% endif %}
   </div>
 {% endblock %}
@@ -85,7 +130,9 @@
       }
     }
     $(document).ready(function() {
-      loadTable( {{ vpt_matrix|safe }});
+      {% if num_adjacent > 0 %}
+        loadTable( {{ vpt_matrix|safe }});
+      {% endif %}
       $("img").unveil();
     });
   </script>

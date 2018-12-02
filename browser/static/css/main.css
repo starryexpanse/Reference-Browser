@@ -51,3 +51,8 @@
 .position-btn {
   margin: 2px;
 }
+
+.filepath {
+  color: gray !important;
+  background: black !important;
+}

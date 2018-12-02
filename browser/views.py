@@ -19,6 +19,7 @@ from flask_wtf import FlaskForm
 from browser.models import (
   Globals,
   Island,
+  Object,
   Position,
   RivenImage,
   RivenMovie,
@@ -183,9 +184,9 @@ def viewpoint(symbol, vpt_name):
     return 'There is no "%s" viewpoint.' % vpt_name
   title = '%s Viewpoint %s' % (island.title(), viewpoint.name)
   img_query=RivenImage.query.filter(
-      RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.friendly)
+      RivenImage.viewpoint == viewpoint.id).order_by(RivenImage.image_height)
   mov_query=RivenMovie.query.filter(
-      RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.friendly)
+      RivenMovie.viewpoint == viewpoint.id).order_by(RivenMovie.movie_height)
   prev_vpt = Viewpoint.query.filter(
       Viewpoint.island == island.id,
       Viewpoint.name < viewpoint.name).order_by(Viewpoint.name.desc()).first()
@@ -198,6 +199,15 @@ def viewpoint(symbol, vpt_name):
     next_vpt = next_vpt.name
 
   vpt_matrix = CreateViewpointMatrix(viewpoint)
+  objects = set()
+  for image in img_query:
+    for object in image.objects:
+      objects.add(object)
+  num_adjacent = 0;
+  for row in vpt_matrix:
+    for cell in row:
+      if cell:
+        num_adjacent += 1
 
   return render_template('viewpoint.html',
       images=img_query,
@@ -207,21 +217,66 @@ def viewpoint(symbol, vpt_name):
       image_count=img_query.count(),
       movie_count=mov_query.count(),
       island_symbol=island.symbol,
+      vpt_name=vpt_name,
       prev_vpt=prev_vpt,
       next_vpt=next_vpt,
       thumbnail_width=g.thumbnail_width,
       thumbnail_height=g.thumbnail_height,
-      vpt_matrix=json.dumps(vpt_matrix))
+      objects=objects,
+      vpt_matrix=json.dumps(vpt_matrix),
+      num_adjacent=num_adjacent)
 
-@browsing.route('/viewpoints')
+@browsing.route('/objects', strict_slashes=False)
 @login_required
-def viewpoints():
-  return render_template('viewpoints.html', viewpoints=Viewpoint.query.all())
+def objects():
+  g = Globals.query.filter(Globals.global_id == 1).first()
+  return render_template('objects.html',
+    thumbnail_width=g.thumbnail_width,
+    thumbnail_height=g.thumbnail_height,
+    objects=Object.query.all())
 
-@browsing.route('/images')
+@browsing.route('/objects/<obj_name>')
 @login_required
-def images():
-  return render_template('images.html', images=RivenImage.query.all())
+def view_obj(obj_name):
+  obj = Object.query.filter(Object.name == obj_name).first()
+  if not obj:
+    return 'There is no "%s" object.' % obj_name
+  return render_template('object.html',
+    object=obj)
+
+@browsing.route('/island/<symbol>/viewpoint/<vpt_name>/view/<view_name>',
+                strict_slashes=False)
+@login_required
+def view(symbol, vpt_name, view_name):
+  island = Island.query.filter(Island.symbol == symbol).first()
+  if not island:
+    return 'There is no "%s" island.' % symbol
+
+  viewpoint = Viewpoint.query.filter(Viewpoint.island == island.id,
+                                     Viewpoint.name == vpt_name).first()
+  if not viewpoint:
+    return 'There is no "%s" viewpoint.' % vpt_name
+  image = None
+  movie = None
+  query=RivenImage.query.filter(RivenImage.viewpoint==viewpoint.id,
+                                RivenImage.friendly == view_name)
+  if query.count():
+    image = query.first()
+  else:
+    query=RivenMovie.query.filter(RivenMovie.viewpoint == viewpoint.id,
+                                  RivenMovie.friendly == view_name)
+    if query.count():
+      movie = query.first()
+  title = '%s / Viewpoint %s / %s' % (island.title(), viewpoint.name, view_name)
+
+  return render_template('view.html',
+      image=image,
+      movie=movie,
+      island_name=island.title(),
+      title=title,
+      viewpoint=viewpoint,
+      vpt_title='%s/%s' % (island.symbol, viewpoint.name),
+      island_symbol=island.symbol)
 
 @browsing.route('/protected/<path:filename>')
 @login_required

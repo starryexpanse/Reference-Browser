@@ -1,13 +1,16 @@
 from flask import Flask
+import os
 
 def create_app():
+  dirpath = os.path.dirname(os.path.abspath(__file__))
+
   app = Flask(__name__)
-  app.config.from_pyfile('config.py')
-  app.config.from_pyfile('instance/config.py')
+  app.config.from_pyfile(os.path.join(dirpath, 'config.py'))
+  app.config.from_pyfile(os.path.join(dirpath, 'instance', 'config.py'))
 
   from browser.models import db, SetTestPassword
   db.init_app(app)
-  with open('instance/password.txt', 'r') as f:
+  with open(os.path.join(dirpath, 'instance', 'password.txt'), 'r') as f:
     SetTestPassword(f.readline().strip())
 
   from browser.views import browsing, login_manager
